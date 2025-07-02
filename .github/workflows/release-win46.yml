@@ -24,8 +24,7 @@ jobs:
         # For details see https://github.com/actions/virtual-environments/issues/785
         uses: al-cheb/configure-pagefile-action@v1.2
       - name: Set version
-        run: mvnw versions:set -DnewVersion="0.0.0"
-#        run: mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
+        run: mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
         shell: cmd
       - name: Build native executable
           # Invoke the native-image build with the necessary Visual Studio tooling/environment intialized
