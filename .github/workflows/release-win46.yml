@@ -16,10 +16,6 @@ jobs:
           java-version: '21'
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install native-image
-        run: |
-          %JAVA_HOME%/bin/gu.cmd install native-image
-        shell: cmd
       - name: Configure Pagefile
         # Increased the page-file size due to memory-consumption of native-image command
         # For details see https://github.com/actions/virtual-environments/issues/785
