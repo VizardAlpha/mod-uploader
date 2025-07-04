@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.argon</groupId>
-    <artifactId>mod-uploader</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <groupId>com.github.argon.moduploader</groupId>
+    <artifactId>root</artifactId>
+    <version>local</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>cli</module>
+        <module>core</module>
+        <module>ui</module>
+    </modules>
 
     <properties>
         <compiler-plugin.version>3.14.0</compiler-plugin.version>
@@ -28,6 +35,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>com.code-disaster.steamworks4j</groupId>
+                <artifactId>steamworks4j</artifactId>
+                <version>${steamworks4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -37,21 +49,19 @@
             <artifactId>quarkus-arc</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-picocli</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.code-disaster.steamworks4j</groupId>
-            <artifactId>steamworks4j</artifactId>
-            <version>${steamworks4j.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-jwt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-jwt-build</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
@@ -61,6 +71,21 @@
 
     <build>
         <plugins>
+            <!-- Required for Quarkus multi module project -->
+            <!-- Will make Quarkus beans from other modules available for CDI -->
+            <plugin>
+                <groupId>io.smallrye</groupId>
+                <artifactId>jandex-maven-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>make-index</id>
+                        <goals>
+                            <goal>jandex</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>

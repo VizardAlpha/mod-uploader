@@ -46,3 +46,4 @@ nb-configuration.xml
 
 # mod-uploader
 steam_appid.txt
+*.token
