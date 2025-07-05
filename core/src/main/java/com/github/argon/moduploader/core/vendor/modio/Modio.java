@@ -10,6 +10,7 @@ import io.quarkus.cache.CacheInvalidateAll;
 import io.quarkus.cache.CacheKey;
 import io.quarkus.cache.CacheResult;
 import jakarta.annotation.Nullable;
+import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -59,6 +60,17 @@ public class Modio implements Cachable<Long> {
 
     public ModioMod.Remote upload(Long gameId, ModioMod.Local mod, @Nullable String version, @Nullable String changelog) throws VendorException {
         return storeService().upload(gameId, mod, version, changelog);
+    }
+
+    public boolean deleteMod(Long gameId, Long modId) {
+        try (Response response = storeService().delete(gameId, modId)) {
+
+            if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override

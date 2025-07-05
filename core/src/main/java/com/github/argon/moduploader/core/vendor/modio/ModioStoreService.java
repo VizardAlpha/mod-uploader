@@ -13,6 +13,7 @@ import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioModDto;
 import com.github.argon.moduploader.core.vendor.modio.model.ModioMod;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Validator;
+import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -142,5 +143,15 @@ public class ModioStoreService {
         ModioModDto modioModDto = modioClient.addMod(bearerToken.toString(), gameId, modioAddModDto);
 
         return mapper.map(modioModDto);
+    }
+
+    public Response delete(Long gameId, Long modId) {
+        BearerToken bearerToken = bearerTokenProvider.get();
+
+        if (bearerToken == null) {
+            throw new AuthException("Bearer token is null");
+        }
+
+        return modioClient.deleteMod(bearerToken.toString(), gameId, modId);
     }
 }
