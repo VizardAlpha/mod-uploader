@@ -1,7 +1,7 @@
-package com.github.argon.moduploader.core.vendor.modio.client;
+package com.github.argon.moduploader.core.vendor.modio.api;
 
-import com.github.argon.moduploader.core.vendor.modio.client.dto.ModioDtoMapper;
-import com.github.argon.moduploader.core.vendor.modio.client.dto.ModioUserDto;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioDtoMapper;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioUserDto;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.Path;

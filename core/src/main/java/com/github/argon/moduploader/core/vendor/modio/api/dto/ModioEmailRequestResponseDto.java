@@ -1,4 +1,4 @@
-package com.github.argon.moduploader.core.vendor.modio.client.dto;
+package com.github.argon.moduploader.core.vendor.modio.api.dto;
 
 public record ModioEmailRequestResponseDto(
     Integer code,

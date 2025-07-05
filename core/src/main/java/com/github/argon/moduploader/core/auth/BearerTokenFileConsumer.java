@@ -1,6 +1,6 @@
 package com.github.argon.moduploader.core.auth;
 
-import com.github.argon.moduploader.core.file.FileService;
+import com.github.argon.moduploader.core.file.IFileService;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class BearerTokenFileConsumer implements Consumer<BearerToken> {
     private final Path path;
-    private final FileService fileService;
+    private final IFileService fileService;
 
     @Override
     public void accept(BearerToken bearerToken) {

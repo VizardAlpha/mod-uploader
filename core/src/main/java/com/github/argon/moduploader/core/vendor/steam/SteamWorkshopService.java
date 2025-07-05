@@ -30,13 +30,14 @@ public class SteamWorkshopService implements Closeable {
     private static BiConsumer<SteamPublishedFileID, SteamResult> updateHandler = null;
     @Nullable
     private static BiConsumer<SteamPublishedFileID, SteamResult> creationHandler = null;
-
     private final static HashMap<SteamUGCQuery, BiConsumer<List<SteamMod.Remote>, SteamResult>> modHandlers = new HashMap<>();
 
+    private static SteamMapper mapper;
     /**
      * @param appId of the Steam game / application
      */
-    public SteamWorkshopService(Integer appId) {
+    public SteamWorkshopService(Integer appId, SteamMapper mapper) {
+        SteamWorkshopService.mapper = mapper;
         SteamWorkshopService.user = new SteamUserService();
         SteamWorkshopService.workshop = new SteamUGC(new Callback());
         SteamWorkshopService.appId = appId;
@@ -44,7 +45,7 @@ public class SteamWorkshopService implements Closeable {
 
     /**
      * Creates or updates a mod in the Steam Workshop.
-     * New mod when {@link SteamMod.Local#publishedFileId()} is null.
+     * New mod when {@link SteamMod.Local#id()} is null.
      *
      * @param mod to upload
      * @param visibility for hiding the mod for other users
@@ -54,9 +55,9 @@ public class SteamWorkshopService implements Closeable {
     public void upload(SteamMod.Local mod, SteamRemoteStorage.PublishedFileVisibility visibility, String changelog, BiConsumer<SteamPublishedFileID, SteamResult> uploadHandler) {
         log.debug("Uploading steam mod {}", mod);
 
-        if (mod.publishedFileId() == null) {
+        if (mod.id() == null) {
             create((steamPublishedFileID, steamResult) -> {
-                update(SteamMapper.map(steamPublishedFileID, mod), visibility, changelog, uploadHandler);
+                update(mapper.map(steamPublishedFileID, mod), visibility, changelog, uploadHandler);
             });
         } else {
             update(mod, visibility, changelog, uploadHandler);
@@ -74,7 +75,7 @@ public class SteamWorkshopService implements Closeable {
     }
 
     /**
-     * Updates a Steam Workshop mod with given {@link SteamMod.Local#publishedFileId()}.
+     * Updates a Steam Workshop mod with given {@link SteamMod.Local#id()}.
      *
      * @param mod to update
      * @param visibility for hiding the mod for other users
@@ -82,15 +83,15 @@ public class SteamWorkshopService implements Closeable {
      * @param updateHandler called when the update is done
      */
     public void update(SteamMod.Local mod, SteamRemoteStorage.PublishedFileVisibility visibility, String changelog, BiConsumer<SteamPublishedFileID, SteamResult> updateHandler) {
-        if (mod.publishedFileId() == null) {
-            log.warn("Cannot update mod without a publishedFileId");
+        if (mod.id() == null) {
+            log.warn("Cannot update mod without a id");
             return;
         }
 
         SteamWorkshopService.updateHandler = updateHandler;
-        SteamUGCUpdateHandle steamUpdateHandle = workshop.startItemUpdate(appId, new SteamPublishedFileID(mod.publishedFileId()));
+        SteamUGCUpdateHandle steamUpdateHandle = workshop.startItemUpdate(appId, new SteamPublishedFileID(mod.id()));
 
-        workshop.setItemTitle(steamUpdateHandle, mod.title());
+        workshop.setItemTitle(steamUpdateHandle, mod.name());
         workshop.setItemDescription(steamUpdateHandle, mod.description());
         workshop.setItemTags(steamUpdateHandle, mod.tags().toArray(String[]::new));
         workshop.setItemPreview(steamUpdateHandle, mod.previewImage().toString());
@@ -169,7 +170,7 @@ public class SteamWorkshopService implements Closeable {
             }
 
             List<SteamMod.Remote> mods = details.stream()
-                .map(SteamMapper::map)
+                .map(mapper::map)
                 .toList();
 
             modHandlers.get(query).accept(mods, result);

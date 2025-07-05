@@ -3,16 +3,14 @@ package com.github.argon.moduploader.core.file;
 import jakarta.annotation.Nullable;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.extern.slf4j.Slf4j;
+import net.lingala.zip4j.ZipFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.List;
 
 /**
@@ -22,6 +20,23 @@ import java.util.List;
 @ApplicationScoped
 public class FileService extends AbstractFileService {
     public final static Charset CHARSET = StandardCharsets.UTF_8;
+    public final static Path TEMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
+
+    @Override
+    public Path zip(Path path) throws IOException {
+        Path absolutePath = path.toAbsolutePath();
+        Path tempFile = Files.createTempFile(TEMP_DIR, path.getFileName().toString(), ".zip");
+
+        try (ZipFile zipFile = new ZipFile(tempFile.toFile())) {
+            if (Files.isDirectory(path)) {
+                zipFile.addFolder(absolutePath.toFile());
+            } else {
+                zipFile.addFile(absolutePath.toFile());
+            }
+        }
+
+        return tempFile;
+    }
 
     public List<String> readLines(Path path) throws IOException {
         Path absolutePath = path.toAbsolutePath();
@@ -62,6 +77,21 @@ public class FileService extends AbstractFileService {
             log.error("Could not read from file {}", absolutePath, e);
             throw e;
         }
+    }
+
+    @Nullable
+    @Override
+    public byte[] readBytes(Path path) throws IOException {
+        Path absolutePath = path.toAbsolutePath();
+        log.debug("Reading bytes from file {}", absolutePath);
+
+        if (!Files.exists(absolutePath)) {
+            // do not load what's not there
+            log.info("{} is not a file, does not exists or is not readable", absolutePath);
+            return null;
+        }
+
+        return Files.readAllBytes(absolutePath);
     }
 
     /**

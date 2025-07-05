@@ -1,90 +1,56 @@
 package com.github.argon.moduploader.cli.command.modio;
 
+import com.github.argon.moduploader.cli.command.CliPrinter;
 import com.github.argon.moduploader.core.auth.BearerToken;
-import com.github.argon.moduploader.core.auth.BearerTokenFileProvider;
-import com.github.argon.moduploader.core.file.FileService;
-import com.github.argon.moduploader.core.vendor.modio.ModioProperties;
-import com.github.argon.moduploader.core.vendor.modio.ModioStoreService;
-import com.github.argon.moduploader.core.vendor.modio.ModioUserService;
-import com.github.argon.moduploader.core.vendor.modio.client.ModioModsClient;
-import com.github.argon.moduploader.core.vendor.modio.client.ModioUserClient;
-import com.github.argon.moduploader.core.vendor.modio.model.ModioUser;
+import com.github.argon.moduploader.core.vendor.modio.Modio;
+import com.github.argon.moduploader.core.vendor.modio.model.ModioMod;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 import picocli.CommandLine;
 
-import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 @Slf4j
-@CommandLine.Command(name = "list", description = "List your published mods.")
+@CommandLine.Command(name = "list", description = "List your published mods on modio.")
 public class ModioListCommand implements Callable<Integer> {
-    @RestClient
-    ModioModsClient modioModsClient;
-
-    @RestClient
-    ModioUserClient modioUserClient;
-
-    @Inject
-    FileService fileService;
-
-    @Inject
-    ModioProperties modioProperties;
+    @CommandLine.ParentCommand
+    ModioCommand parentCommand;
 
     @Inject
     ModioLoginCommand loginCommand;
 
-    // TODO make this global for all modio commands
-    @CommandLine.Option(names = {"-key", "--api-key"}, required = true,
-        description = "The mod.io api access key. You can create a key in your mod.io profile")
-    String apiKey;
-
-    @CommandLine.Option(names = {"-app", "--app-id"}, required = true)
-    Long gameId;
-
-    @CommandLine.Option(names = {"-oid", "--owner-id"})
-    Long ownerId;
+    @Inject
+    CliPrinter cliPrinter;
 
     @Override
     public Integer call() {
-        if (apiKey == null) {
-            apiKey = modioProperties.apiKey().orElse(null);
-        }
-
-        if (apiKey == null) {
-            System.err.println("""
-                No modio.api-key found in application.properties.
-                You have to specify the key via '-key=1234'""");
+        if (!parentCommand.init(null)) {
             return 1;
         }
 
-        ModioStoreService modioStore = new ModioStoreService(apiKey, gameId, modioModsClient);
+        Modio modio = parentCommand.modio;
+        BearerToken bearerToken = modio.getAuthService().getBearerToken();
 
-        if (ownerId == null) {
-            Path tokenFilePath = modioProperties.tokenFilePath();
-            BearerTokenFileProvider bearerTokenProvider = new BearerTokenFileProvider(tokenFilePath, fileService);
-            BearerToken bearerToken = bearerTokenProvider.get();
-
-            // force login
-            while (bearerToken == null || bearerToken.isExpired()) {
-                new CommandLine(loginCommand).execute("-key=%s".formatted(apiKey), "-e");
-                bearerToken = bearerTokenProvider.get();
-            }
-
-            ModioUserService userService = new ModioUserService(modioUserClient);
-            ModioUser user = userService.getUser(bearerToken);
-
-            ownerId = user.id();
+        // force login
+        while (bearerToken == null || bearerToken.isExpired()) {
+            new CommandLine(loginCommand).execute( "-e");
+            bearerToken = modio.getAuthService().getBearerToken();
         }
 
-        modioStore.fetchPublishedMods(ownerId)
-            .forEach(mod -> {
-                System.out.printf("name=%s | id=%s | owner=%s | ownerId=%s | dateUpdated=%s\n",
-                    mod.name(), mod.id(), mod.owner(), mod.ownerId(), mod.dateUpdated());
-            });
-
+        List<ModioMod.Remote> publishedMods = modio.getMods(bearerToken);
+        printResult(publishedMods);
 
         return 0;
+    }
+
+    private void printResult(List<ModioMod.Remote> mods) {
+        cliPrinter.printTable(mods, mod -> new String[]{
+            mod.id().toString(),
+            mod.name(),
+            mod.owner(),
+            mod.ownerId().toString(),
+            mod.timeUpdated().toString()
+        }, "id", "name", "owner", "ownerId", "timeUpdated");
     }
 }

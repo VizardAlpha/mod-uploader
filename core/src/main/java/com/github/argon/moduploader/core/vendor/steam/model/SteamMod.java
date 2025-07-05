@@ -8,8 +8,8 @@ import java.util.List;
 
 public record SteamMod() {
     public record Remote(
-        @Nullable Long publishedFileId,
-        String title,
+        @Nullable Long id,
+        String name,
         List<String> tags,
         @Nullable String description,
         Integer fileSize,
@@ -21,8 +21,8 @@ public record SteamMod() {
     ){}
 
     public record Local(
-        @Nullable Long publishedFileId,
-        String title,
+        @Nullable Long id,
+        String name,
         @Nullable String description,
         List<String> tags,
         Path contentFolder,

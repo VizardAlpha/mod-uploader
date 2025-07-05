@@ -1,11 +1,11 @@
 package com.github.argon.moduploader.cli.command.steam;
 
 import com.codedisaster.steamworks.SteamRemoteStorage;
-import com.github.argon.moduploader.core.file.FileService;
+import com.github.argon.moduploader.core.file.IFileService;
 import com.github.argon.moduploader.core.vendor.steam.Steam;
-import com.github.argon.moduploader.core.vendor.steam.model.SteamMod;
 import com.github.argon.moduploader.core.vendor.steam.SteamMapper;
 import com.github.argon.moduploader.core.vendor.steam.SteamWorkshopService;
+import com.github.argon.moduploader.core.vendor.steam.model.SteamMod;
 import jakarta.inject.Inject;
 import picocli.CommandLine;
 
@@ -13,15 +13,16 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
-@CommandLine.Command(name = "upload", description = "Upload a mod to the Steam Workshop.")
+@CommandLine.Command(name = "upload", description = "Upload a mod to the Steam Workshop. Prints the published file id of the mod.")
 public class SteamUploadCommand implements Runnable {
+    @CommandLine.ParentCommand
+    SteamCommand parentCommand;
 
     @Inject
-    FileService fileService;
+    IFileService fileService;
 
-    @CommandLine.Option(names = {"-app", "--app-id"}, defaultValue = "480",
-        description = "The Steam app id of the game you want to upload a mod to.")
-    Integer appId;
+    @Inject
+    SteamMapper mapper;
 
     @CommandLine.Option(names = {"-id", "--published-file-id"},
         description = "Identifies the mod in the Steam Workshop. Will create a new mod when empty or update a mod with the given id.")
@@ -47,18 +48,20 @@ public class SteamUploadCommand implements Runnable {
         description = "The folder with your mod files to upload.")
     Path contentFolder;
 
-    @CommandLine.Option(names = {"-img", "--image"}, required = true,
+    @CommandLine.Option(names = {"-i", "--image"}, required = true,
         description = "The thumbnail and preview image of the mod.")
     Path previewImage;
 
-    @CommandLine.Option(names = {"-t", "--tags"},
+    @CommandLine.Option(names = {"-t", "--tags"}, split = ",",
         description = "A list of tags to help users finding your mod.")
     List<String> tags = Collections.emptyList();
 
     @Override
     public void run() {
+        Integer appId = parentCommand.appId;
+
         try {
-            try (Steam steam = new Steam(appId, fileService)) {
+            try (Steam steam = new Steam(appId, fileService, mapper)) {
                 try (SteamWorkshopService workshop = steam.getWorkshop()) {
                     workshop.upload(
                         new SteamMod.Local(
@@ -72,8 +75,7 @@ public class SteamUploadCommand implements Runnable {
                         visibility,
                         changelog,
                         (steamPublishedFileID, steamResult) -> {
-                            System.out.println(steamResult.toString());
-                            System.out.println(SteamMapper.map(steamPublishedFileID));
+                            System.out.println(mapper.toLong(steamPublishedFileID));
                         });
                 }
 

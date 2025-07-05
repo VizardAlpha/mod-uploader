@@ -1,6 +1,6 @@
 package com.github.argon.moduploader.core.auth;
 
-import com.github.argon.moduploader.core.file.FileService;
+import com.github.argon.moduploader.core.file.IFileService;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Provider;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +15,12 @@ import java.util.List;
 public class BearerTokenFileProvider implements Provider<BearerToken> {
     private BearerToken token;
     private final Path path;
-    private final FileService fileService;
+    private final IFileService fileService;
 
     @Override
     @Nullable
     public BearerToken get() {
-        if (token == null) {
+        if (token == null || token.isExpired()) {
             token = readToken();
         }
 

@@ -30,6 +30,9 @@ public interface IFileService {
     @Nullable
     String read(Path path) throws IOException;
 
+    @Nullable
+    byte[] readBytes(Path path) throws IOException;
+
     /**
      * Writes given content into file by replacing it.
      *
@@ -47,4 +50,6 @@ public interface IFileService {
      * @throws IOException if something goes wrong when deleting
      */
     boolean delete(Path path) throws IOException;
+
+    Path zip(Path path) throws IOException;
 }

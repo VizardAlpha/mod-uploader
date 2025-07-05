@@ -1,6 +1,6 @@
-package com.github.argon.moduploader.core.vendor.modio.client;
+package com.github.argon.moduploader.core.vendor.modio.api;
 
-import com.github.argon.moduploader.core.vendor.modio.client.dto.*;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
@@ -14,7 +14,7 @@ public interface ModioOAuthClient {
     @Path("/logout")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    LogoutDto logout(
+    ModioLogoutDto logout(
         @HeaderParam("Authorization") String bearerToken
     );
 

@@ -2,9 +2,12 @@ package com.github.argon.moduploader.core.vendor.modio;
 
 import com.github.argon.moduploader.core.auth.AuthException;
 import com.github.argon.moduploader.core.auth.BearerToken;
-import com.github.argon.moduploader.core.vendor.modio.client.ModioApiException;
-import com.github.argon.moduploader.core.vendor.modio.client.ModioOAuthClient;
-import com.github.argon.moduploader.core.vendor.modio.client.dto.*;
+import com.github.argon.moduploader.core.vendor.modio.api.ModioApiException;
+import com.github.argon.moduploader.core.vendor.modio.api.ModioOAuthClient;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioAccessTokenDto;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioEmailRequestResponseDto;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioLogoutDto;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Provider;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +20,21 @@ import java.util.function.Consumer;
 public class ModioAuthService {
     private final String apiKey;
     private final ModioOAuthClient authClient;
+    private final Provider<BearerToken> bearerTokenProvider;
+    private final Consumer<BearerToken> bearerTokenConsumer;
 
-    public void logout(Provider<BearerToken> bearerTokenProvider) {
+    @Nullable
+    public BearerToken getBearerToken() {
+        return bearerTokenProvider.get();
+    }
+
+    public void setBearerToken(BearerToken bearerToken) {
+        bearerTokenConsumer.accept(bearerToken);
+    }
+
+    public void logout() {
         try {
-            LogoutDto logout = authClient.logout(bearerTokenProvider.get().toString());
+            ModioLogoutDto logout = authClient.logout(bearerTokenProvider.get().toString());
             if (logout.success()) {
                 throw new AuthException("Logout failed (" + logout.code() + "): " + logout.message());
             }
@@ -41,7 +55,7 @@ public class ModioAuthService {
         }
     }
 
-    public void exchangeEmailCode(String emailCode, Consumer<BearerToken> bearerTokenConsumer) {
+    public void exchangeEmailCode(String emailCode) {
         try {
             ModioAccessTokenDto accessToken = authClient.emailExchange(apiKey, emailCode);
 

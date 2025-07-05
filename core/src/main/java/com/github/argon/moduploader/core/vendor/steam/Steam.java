@@ -5,7 +5,7 @@ import com.codedisaster.steamworks.SteamException;
 import com.github.argon.moduploader.core.Blockable;
 import com.github.argon.moduploader.core.Initializable;
 import com.github.argon.moduploader.core.InitializeException;
-import com.github.argon.moduploader.core.file.FileService;
+import com.github.argon.moduploader.core.file.IFileService;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,15 +23,17 @@ import java.time.Instant;
 @Slf4j
 public class Steam implements Closeable, Blockable, Runnable, Initializable<Integer> {
     public static final String STEAM_APP_ID_TXT = "steam_appid.txt";
-    private final FileService fileService;
 
     @Getter
     private final String steamAppIdTxt;
     @Getter
     private SteamWorkshopService workshop;
 
-    public Steam(Integer appId, FileService fileService) throws InitializeException {
-        this(appId, fileService, STEAM_APP_ID_TXT);
+    private final IFileService fileService;
+    private final SteamMapper mapper;
+
+    public Steam(Integer appId, IFileService fileService, SteamMapper mapper) throws InitializeException {
+        this(appId, fileService, STEAM_APP_ID_TXT, mapper);
     }
 
     /**
@@ -40,9 +42,10 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
      * @param steamAppIdTxt name of the steam appid txt file, which needs to be present next to this app
      * @throws InitializeException when {@link SteamAPI} initialization or steamAppIdTxt file creation fails
      */
-    public Steam(Integer appId, FileService fileService, String steamAppIdTxt) throws InitializeException {
+    public Steam(Integer appId, IFileService fileService, String steamAppIdTxt, SteamMapper mapper) throws InitializeException {
         this.steamAppIdTxt = steamAppIdTxt;
         this.fileService = fileService;
+        this.mapper = mapper;
 
         init(appId);
     }
@@ -62,7 +65,7 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
      * @param appId of the game to use
      */
     @Override
-    public void init(Integer appId) throws InitializeException {
+    public boolean init(Integer appId) throws InitializeException {
         initSteamAppId(appId);
         initSteamNativeApi();
 
@@ -71,7 +74,9 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
             workshop.close();
         }
 
-        workshop = new SteamWorkshopService(appId);
+        workshop = new SteamWorkshopService(appId, mapper);
+
+        return true;
     }
 
     /**
