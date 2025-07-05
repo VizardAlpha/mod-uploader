@@ -8,6 +8,9 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
+import java.util.List;
+import java.util.Optional;
+
 @Path("games")
 @RegisterRestClient
 @RegisterProvider(ModioDtoMapper.class) // use custom configured jackson object mapper
@@ -15,11 +18,23 @@ public interface ModioModsClient {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{game-id}/mods/{mod-id}")
+    Optional<ModioModDto> getMod(
+        @QueryParam("api_key") String apiKey,
+        @PathParam("game-id") Long gameId,
+        @PathParam("mod-id") Long modId
+    );
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{game-id}/mods")
     ModioModsDto getMods(
         @QueryParam("api_key") String apiKey,
         @PathParam("game-id") Long gameId,
-        @Nullable @QueryParam("submitted_by") Long userId
+        @Nullable @QueryParam("submitted_by") Long submittedBy,
+        @Nullable @QueryParam("submitted_by_display_name") String submittedByDisplayName,
+        @Nullable @QueryParam("name") String name,
+        @Nullable @QueryParam("tags") List<String> tags
     );
 
     /**

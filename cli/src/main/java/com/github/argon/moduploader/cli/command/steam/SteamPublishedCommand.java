@@ -13,8 +13,8 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-@CommandLine.Command(name = "list", description = "List your published mods")
-public class SteamListCommand implements Runnable {
+@CommandLine.Command(name = "published", description = "List your published mods")
+public class SteamPublishedCommand implements Runnable {
     @CommandLine.ParentCommand
     SteamCommand parentCommand;
 

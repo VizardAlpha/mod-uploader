@@ -7,6 +7,7 @@ import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioCreditOptions
 import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioMaturityOptions;
 import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioVisibility;
 import com.github.argon.moduploader.core.vendor.modio.model.ModioMod;
+import jakarta.inject.Inject;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
@@ -17,6 +18,8 @@ import java.util.concurrent.Callable;
 public class ModioUploadCommand implements Callable<Integer> {
     @CommandLine.ParentCommand
     ModioCommand parentCommand;
+
+    @Inject Modio modio;
 
     @CommandLine.Option(names = {"-id", "--mod-id"},
         description = "Identifies the mod in mod.io. Will create a new mod when empty or update a mod with the given id.")
@@ -60,12 +63,6 @@ public class ModioUploadCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        if (!parentCommand.init(null)) {
-            return 1;
-        }
-
-        Modio modio = parentCommand.modio;
-
         ModioMod.Local mod = new ModioMod.Local(
             modId,
             name,
@@ -85,7 +82,8 @@ public class ModioUploadCommand implements Callable<Integer> {
         );
 
         try {
-            ModioMod.Remote remote = modio.upload(mod, version, changelog);
+            Long gameId = parentCommand.gameId;
+            ModioMod.Remote remote = modio.upload(gameId, mod, version, changelog);
             System.out.println(remote.id());
         } catch (VendorException e) {
             throw new RuntimeException(e);

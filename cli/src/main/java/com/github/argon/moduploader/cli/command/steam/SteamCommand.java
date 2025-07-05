@@ -4,7 +4,7 @@ import picocli.CommandLine;
 
 @CommandLine.Command(name = "steam", mixinStandardHelpOptions = true, subcommands = {
     SteamUploadCommand.class,
-    SteamListCommand.class,
+    SteamPublishedCommand.class,
     SteamSearchGameCommand.class,
     SteamSearchModCommand.class,
     SteamDeleteCommand.class

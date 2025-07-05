@@ -2,6 +2,7 @@ package com.github.argon.moduploader.core.vendor.modio;
 
 import com.github.argon.moduploader.core.auth.AuthException;
 import com.github.argon.moduploader.core.auth.BearerToken;
+import com.github.argon.moduploader.core.auth.BearerTokenFileProvider;
 import com.github.argon.moduploader.core.file.IFileService;
 import com.github.argon.moduploader.core.vendor.VendorException;
 import com.github.argon.moduploader.core.vendor.modio.api.ModioModsClient;
@@ -11,7 +12,6 @@ import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioEditModDto;
 import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioModDto;
 import com.github.argon.moduploader.core.vendor.modio.model.ModioMod;
 import jakarta.annotation.Nullable;
-import jakarta.inject.Provider;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 
@@ -22,28 +22,44 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 public class ModioStoreService {
 
-    private final String apiKey;
-    private final Long gameId;
     private final ModioModsClient modioClient;
     private final ModioMapper mapper;
     private final IFileService fileService;
-    private final Provider<BearerToken> bearerTokenProvider;
+    private final BearerTokenFileProvider bearerTokenProvider;
     private final Validator validator;
 
-    public List<ModioMod.Remote> getMods(@Nullable Long userId) {
-        // todo paging
-        return modioClient.getMods(apiKey, gameId, userId)
+    public List<ModioMod.Remote> searchMods(
+        String apiKey,
+        Long gameId,
+        @Nullable Long submittedBy,
+        @Nullable String submittedByDisplayName,
+        @Nullable String modName,
+        @Nullable List<String> tags
+    ) {
+        return modioClient.getMods(apiKey, gameId, submittedBy, submittedByDisplayName, modName, tags)
             .data().stream()
             .map(mapper::map)
             .toList();
     }
 
-    public ModioMod.Remote upload(ModioMod.Local mod, @Nullable String version, @Nullable String changelog) throws VendorException {
+
+
+    public List<ModioMod.Remote> getUserMods(String apiKey, Long gameId, Long userId) {
+        return searchMods(apiKey, gameId, userId, null, null, null);
+    }
+
+    public Optional<ModioMod.Remote> getMod(String apiKey, Long gameId, Long modId) {
+        return modioClient.getMod(apiKey, gameId, modId)
+            .map(mapper::map);
+    }
+
+    public ModioMod.Remote upload(Long gameId, ModioMod.Local mod, @Nullable String version, @Nullable String changelog) throws VendorException {
         BearerToken bearerToken = bearerTokenProvider.get();
 
         if (bearerToken == null) {
@@ -54,21 +70,21 @@ public class ModioStoreService {
         Long modId = mod.id();
         ModioMod.Remote remote;
         if (modId == null) {
-            remote = create(mod);
+            remote = create(gameId, mod);
         } else {
-            remote = update(mod);
+            remote = update(gameId, mod);
         }
 
         modId = remote.id();
         ModioMod.Local updatedMod = mapper.map(modId, mod);
 
         // upload file
-        addModFile(updatedMod,  version, changelog);
+        addModFile(gameId, updatedMod, version, changelog);
 
         return remote;
     }
 
-    public ModioMod.Remote update(ModioMod.Local mod) throws VendorException {
+    public ModioMod.Remote update(Long gameId,ModioMod.Local mod) throws VendorException {
         BearerToken bearerToken = bearerTokenProvider.get();
 
         if (bearerToken == null) {
@@ -82,7 +98,7 @@ public class ModioStoreService {
         return mapper.map(modioModDto);
     }
 
-    public void addModFile(ModioMod.Local mod, @Nullable String version, @Nullable String changelog) throws VendorException {
+    public void addModFile(Long gameId, ModioMod.Local mod, @Nullable String version, @Nullable String changelog) throws VendorException {
         BearerToken bearerToken = bearerTokenProvider.get();
 
         if (bearerToken == null) {
@@ -114,7 +130,7 @@ public class ModioStoreService {
         }
     }
 
-    public ModioMod.Remote create(ModioMod.Local mod) throws VendorException {
+    public ModioMod.Remote create(Long gameId, ModioMod.Local mod) throws VendorException {
         BearerToken bearerToken = bearerTokenProvider.get();
 
         if (bearerToken == null) {

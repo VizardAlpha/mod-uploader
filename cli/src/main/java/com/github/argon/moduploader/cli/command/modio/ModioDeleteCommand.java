@@ -11,9 +11,6 @@ public class ModioDeleteCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        if (!parentCommand.init(null)) {
-            return 1;
-        }
 
         return 0;
     }

@@ -25,7 +25,6 @@ public class EntryCommand implements Runnable, QuarkusApplication {
     @Override
     public int run(String... args) throws Exception {
         return new CommandLine(this, cliFactory)
-//            .setExecutionExceptionHandler(new CliExceptionHandler())
             .execute(args);
     }
 }

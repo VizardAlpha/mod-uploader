@@ -1,5 +1,6 @@
 package com.github.argon.moduploader.cli.command;
 
+import com.github.argon.moduploader.core.vendor.modio.model.ModioMod;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
@@ -7,6 +8,17 @@ import java.util.function.Function;
 
 @ApplicationScoped
 public class CliPrinter {
+
+    public void printMods(List<ModioMod.Remote> mods) {
+        printTable(mods, mod -> new String[]{
+            mod.id().toString(),
+            mod.name(),
+            mod.owner(),
+            mod.ownerId().toString(),
+            mod.timeUpdated().toString()
+        }, "id", "name", "owner", "ownerId", "timeUpdated");
+    }
+
     public <T> void printTable(List<T> rows, Function<T, String[]> mapper, String... headers) {
         String[][] rowsArray = rows.stream()
             .map(mapper)
@@ -38,10 +50,10 @@ public class CliPrinter {
             columnFormats[i] = format;
         }
 
-        String rowFormat = String.join("\t", columnFormats);
+        String rowFormat = String.join("\t", columnFormats) + "%n";
 
         //noinspection ConfusingArgumentToVarargsMethod
-        System.out.printf(rowFormat + "%n", headers);
+        System.out.printf(rowFormat, headers);
 
         for (String[] row : rows) {
             //noinspection ConfusingArgumentToVarargsMethod

@@ -2,26 +2,24 @@ package com.github.argon.moduploader.core.vendor.modio;
 
 import com.github.argon.moduploader.core.auth.AuthException;
 import com.github.argon.moduploader.core.auth.BearerToken;
+import com.github.argon.moduploader.core.auth.BearerTokenFileConsumer;
+import com.github.argon.moduploader.core.auth.BearerTokenFileProvider;
 import com.github.argon.moduploader.core.vendor.modio.api.ModioApiException;
 import com.github.argon.moduploader.core.vendor.modio.api.ModioOAuthClient;
 import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioAccessTokenDto;
 import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioEmailRequestResponseDto;
 import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioLogoutDto;
 import jakarta.annotation.Nullable;
-import jakarta.inject.Provider;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.function.Consumer;
-
 @Slf4j
 @RequiredArgsConstructor
 public class ModioAuthService {
-    private final String apiKey;
     private final ModioOAuthClient authClient;
-    private final Provider<BearerToken> bearerTokenProvider;
-    private final Consumer<BearerToken> bearerTokenConsumer;
+    private final BearerTokenFileProvider bearerTokenProvider;
+    private final BearerTokenFileConsumer bearerTokenConsumer;
 
     @Nullable
     public BearerToken getBearerToken() {
@@ -34,7 +32,7 @@ public class ModioAuthService {
 
     public void logout() {
         try {
-            ModioLogoutDto logout = authClient.logout(bearerTokenProvider.get().toString());
+            ModioLogoutDto logout = authClient.logout(getBearerToken().toString());
             if (logout.success()) {
                 throw new AuthException("Logout failed (" + logout.code() + "): " + logout.message());
             }
@@ -43,7 +41,7 @@ public class ModioAuthService {
         }
     }
 
-    public void requestEmailCode(String email) {
+    public void requestEmailCode(String apiKey, String email) {
         try {
             ModioEmailRequestResponseDto emailRequestResponse = authClient.emailRequest(apiKey, email);
 
@@ -55,7 +53,7 @@ public class ModioAuthService {
         }
     }
 
-    public void exchangeEmailCode(String emailCode) {
+    public void exchangeEmailCode(String apiKey, String emailCode) {
         try {
             ModioAccessTokenDto accessToken = authClient.emailExchange(apiKey, emailCode);
 

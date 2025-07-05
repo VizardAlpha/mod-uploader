@@ -10,7 +10,6 @@ import java.util.Optional;
 @StaticInitSafe
 @ConfigMapping(prefix = "modio")
 public interface ModioProperties {
-
     Optional<String> apiKey();
     @WithDefault("modio.token")
     Path tokenFilePath();
