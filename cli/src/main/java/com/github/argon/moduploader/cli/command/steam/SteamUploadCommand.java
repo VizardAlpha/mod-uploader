@@ -5,8 +5,10 @@ import com.github.argon.moduploader.core.file.IFileService;
 import com.github.argon.moduploader.core.vendor.steam.Steam;
 import com.github.argon.moduploader.core.vendor.steam.SteamMapper;
 import com.github.argon.moduploader.core.vendor.steam.SteamWorkshopService;
+import com.github.argon.moduploader.core.vendor.steam.api.SteamStoreClient;
 import com.github.argon.moduploader.core.vendor.steam.model.SteamMod;
 import jakarta.inject.Inject;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
@@ -18,11 +20,9 @@ public class SteamUploadCommand implements Runnable {
     @CommandLine.ParentCommand
     SteamCommand parentCommand;
 
-    @Inject
-    IFileService fileService;
-
-    @Inject
-    SteamMapper mapper;
+    @Inject IFileService fileService;
+    @Inject SteamMapper mapper;
+    @RestClient SteamStoreClient storeClient;
 
     @CommandLine.Option(names = {"-id", "--published-file-id"},
         description = "Identifies the mod in the Steam Workshop. Will create a new mod when empty or update a mod with the given id.")
@@ -61,7 +61,7 @@ public class SteamUploadCommand implements Runnable {
         Integer appId = parentCommand.appId;
 
         try {
-            try (Steam steam = new Steam(appId, fileService, mapper)) {
+            try (Steam steam = new Steam(appId, fileService, storeClient, mapper)) {
                 try (SteamWorkshopService workshop = steam.getWorkshop()) {
                     workshop.upload(
                         new SteamMod.Local(
@@ -82,6 +82,7 @@ public class SteamUploadCommand implements Runnable {
                 steam.block();
             }
         } catch (Exception e) {
+            // TODO better exceptions
             throw new RuntimeException(e);
         }
     }

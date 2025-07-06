@@ -1,6 +1,7 @@
 package com.github.argon.moduploader.core.vendor.steam;
 
 import com.codedisaster.steamworks.*;
+import com.github.argon.moduploader.core.vendor.VendorException;
 import com.github.argon.moduploader.core.vendor.steam.model.SteamMod;
 import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +23,10 @@ import java.util.function.BiConsumer;
 @Slf4j
 public class SteamWorkshopService implements Closeable {
 
+    private static Integer appId;
     private static SteamUGC workshop;
     private static SteamUserService user;
-    private static Integer appId;
+
 
     @Nullable
     private static BiConsumer<SteamPublishedFileID, SteamResult> updateHandler = null;
@@ -117,12 +119,31 @@ public class SteamWorkshopService implements Closeable {
         workshop.dispose();
     }
 
+    public void searchMods(String searchText, BiConsumer<List<SteamMod.Remote>, SteamResult> modsHandler) throws VendorException {
+        // TODO pagination
+        SteamUGCQuery queryAllUGCRequest = workshop.createQueryAllUGCRequest(
+            SteamUGC.UGCQueryType.RankedByTextSearch,
+            SteamUGC.MatchingUGCType.Items,
+            appId,
+            appId,
+            1
+        );
+
+        if(!workshop.setSearchText(queryAllUGCRequest, searchText)) {
+            throw new VendorException("Invalid SteamUGCQuery");
+        }
+
+        workshop.sendQueryUGCRequest(queryAllUGCRequest);
+        modHandlers.put(queryAllUGCRequest, modsHandler);
+    }
+
     /**
      * Reads all published Steam Workshop mods from the currently logged-in user
      *
      * @param modsHandler called when the search query is finished
      */
-    public void fetchPublishedMods(BiConsumer<List<SteamMod.Remote>, SteamResult> modsHandler) {
+    public void getPublishedMods(BiConsumer<List<SteamMod.Remote>, SteamResult> modsHandler) {
+        // TODO pagination
         SteamUGCQuery queryUserUGCRequest = workshop.createQueryUserUGCRequest(
             user.getSteamID().getAccountID(),
             SteamUGC.UserUGCList.Published,
@@ -130,7 +151,7 @@ public class SteamWorkshopService implements Closeable {
             SteamUGC.UserUGCListSortOrder.LastUpdatedDesc,
             appId,
             appId,
-            modHandlers.size() + 1
+             1
         );
 
         workshop.sendQueryUGCRequest(queryUserUGCRequest);

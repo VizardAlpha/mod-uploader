@@ -6,6 +6,7 @@ import com.github.argon.moduploader.core.Blockable;
 import com.github.argon.moduploader.core.Initializable;
 import com.github.argon.moduploader.core.InitializeException;
 import com.github.argon.moduploader.core.file.IFileService;
+import com.github.argon.moduploader.core.vendor.steam.api.SteamStoreClient;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +31,11 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
     private SteamWorkshopService workshop;
 
     private final IFileService fileService;
+    private final SteamStoreClient storeClient;
     private final SteamMapper mapper;
 
-    public Steam(Integer appId, IFileService fileService, SteamMapper mapper) throws InitializeException {
-        this(appId, fileService, STEAM_APP_ID_TXT, mapper);
+    public Steam(Integer appId, IFileService fileService, SteamStoreClient storeClient, SteamMapper mapper) throws InitializeException {
+        this(appId, fileService, STEAM_APP_ID_TXT, storeClient, mapper);
     }
 
     /**
@@ -42,10 +44,11 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
      * @param steamAppIdTxt name of the steam appid txt file, which needs to be present next to this app
      * @throws InitializeException when {@link SteamAPI} initialization or steamAppIdTxt file creation fails
      */
-    public Steam(Integer appId, IFileService fileService, String steamAppIdTxt, SteamMapper mapper) throws InitializeException {
+    public Steam(Integer appId, IFileService fileService, String steamAppIdTxt, SteamStoreClient storeClient, SteamMapper mapper) throws InitializeException {
         this.steamAppIdTxt = steamAppIdTxt;
         this.fileService = fileService;
         this.mapper = mapper;
+        this.storeClient = storeClient;
 
         init(appId);
     }
