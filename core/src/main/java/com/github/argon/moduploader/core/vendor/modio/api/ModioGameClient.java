@@ -25,7 +25,9 @@ public interface ModioGameClient {
         @QueryParam("api_key") String apiKey,
         @Nullable @QueryParam("id") Long gameId,
         @Nullable @QueryParam("submitted_by") Long submittedBy,
-        @Nullable @QueryParam("name") String name
+        @Nullable @QueryParam("name") String name,
+        @Nullable @QueryParam("_offset") Integer offset,
+        @Nullable @QueryParam("_limit") Integer limit
     );
 
     @GET

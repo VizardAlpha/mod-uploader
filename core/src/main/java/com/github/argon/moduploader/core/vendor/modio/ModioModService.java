@@ -6,10 +6,7 @@ import com.github.argon.moduploader.core.auth.BearerTokenFileProvider;
 import com.github.argon.moduploader.core.file.IFileService;
 import com.github.argon.moduploader.core.vendor.VendorException;
 import com.github.argon.moduploader.core.vendor.modio.api.ModioModsClient;
-import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioAddModDto;
-import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioAddModFileDto;
-import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioEditModDto;
-import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioModDto;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.*;
 import com.github.argon.moduploader.core.vendor.modio.model.ModioMod;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Validator;
@@ -22,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ModioModService {
 
-    private final ModioModsClient modioClient;
+    private final ModioModsClient modClient;
     private final ModioMapper mapper;
     private final IFileService fileService;
     private final BearerTokenFileProvider bearerTokenProvider;
@@ -43,8 +41,20 @@ public class ModioModService {
         @Nullable String modName,
         @Nullable List<String> tags
     ) {
-        return modioClient.getMods(apiKey, gameId, submittedBy, submittedByDisplayName, modName, tags)
-            .data().stream()
+        List<ModioModDto> mods = new ArrayList<>();
+
+        int offset = 0;
+        int modsTotal = 0;
+
+        do {
+            ModioModsDto modsPage = modClient.getMods(apiKey, gameId, submittedBy, submittedByDisplayName, modName, tags, offset, null);
+            mods.addAll(modsPage.data());
+
+            modsTotal = modsPage.resultTotal();
+            offset += mods.size();
+        } while (mods.size() < modsTotal);
+
+        return mods.stream()
             .map(mapper::map)
             .toList();
     }
@@ -54,7 +64,7 @@ public class ModioModService {
     }
 
     public Optional<ModioMod.Remote> getMod(String apiKey, Long gameId, Long modId) {
-        return modioClient.getMod(apiKey, gameId, modId)
+        return modClient.getMod(apiKey, gameId, modId)
             .map(mapper::map);
     }
 
@@ -92,7 +102,7 @@ public class ModioModService {
 
         ModioEditModDto modioEditModDto = mapper.mapEdit(mod);
         validator.validate(modioEditModDto);
-        ModioModDto modioModDto = modioClient.editMod(bearerToken.toString(), gameId, mod.id(), modioEditModDto);
+        ModioModDto modioModDto = modClient.editMod(bearerToken.toString(), gameId, mod.id(), modioEditModDto);
 
         return mapper.map(modioModDto);
     }
@@ -123,7 +133,7 @@ public class ModioModService {
                 null // TODO implement platforms?
             );
 
-            modioClient.addModFile(bearerToken.toString(), gameId, mod.id(), modioAddModFileDto);
+            modClient.addModFile(bearerToken.toString(), gameId, mod.id(), modioAddModFileDto);
         } catch (IOException | NoSuchAlgorithmException e) {
             throw new VendorException(e);
         }
@@ -138,7 +148,7 @@ public class ModioModService {
 
         ModioAddModDto modioAddModDto = mapper.mapAdd(mod);
         validator.validate(modioAddModDto);
-        ModioModDto modioModDto = modioClient.addMod(bearerToken.toString(), gameId, modioAddModDto);
+        ModioModDto modioModDto = modClient.addMod(bearerToken.toString(), gameId, modioAddModDto);
 
         return mapper.map(modioModDto);
     }
@@ -150,6 +160,6 @@ public class ModioModService {
             throw new AuthException("Bearer token is null or expired");
         }
 
-        return modioClient.archiveMod(bearerToken.toString(), gameId, modId);
+        return modClient.archiveMod(bearerToken.toString(), gameId, modId);
     }
 }

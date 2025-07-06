@@ -23,62 +23,39 @@ public abstract class ModioMapper {
     @Mapping(target = "owner", source = "submittedBy.username")
     @Mapping(target = "timeCreated", source = "dateAdded", qualifiedByName = "toInstant")
     @Mapping(target = "timeUpdated", source = "dateUpdated", qualifiedByName = "toInstant")
-    abstract ModioMod.Remote map(ModioModDto data);
+    abstract ModioMod.Remote map(ModioModDto modDto);
 
-    abstract ModioUser map(ModioUserDto user);
+    abstract ModioUser map(ModioUserDto userDto);
 
     @Mapping(target = "timeCreated", source = "dateAdded", qualifiedByName = "toInstant")
     @Mapping(target = "timeUpdated", source = "dateUpdated", qualifiedByName = "toInstant")
-    abstract ModioGame map(ModioGameDto game);
+    abstract ModioGame map(ModioGameDto gameDto);
+
+    @Mapping(target = "logo", source = "logoData")
+    abstract ModioEditModDto mapEdit(byte[] logoData, ModioMod.Local mod);
+    @Mapping(target = "logo", source = "logoData")
+    abstract ModioAddModDto mapAdd(byte[] logoData, ModioMod.Local mod);
 
     public ModioEditModDto mapEdit(ModioMod.Local mod) throws VendorException {
-        byte[] logo;
+        byte[] logoData;
         try {
-            logo = fileService.readBytes(mod.logo());
+            logoData = fileService.readBytes(mod.logo());
         } catch (IOException e) {
-            throw new VendorException("Error reading mod logo from: " + mod.logo(),e);
+            throw new VendorException("Error reading mod logo from: " + mod.logo(), e);
         }
 
-        return new ModioEditModDto(
-            mod.name(),
-            mod.nameId(),
-            mod.summary(),
-            mod.description(),
-            logo,
-            mod.homepageUrl(),
-            mod.visible(),
-            mod.maturityOptions(),
-            mod.creditOptions(),
-            mod.communityOptions(),
-            mod.stock(),
-            mod.metadataKvp(),
-            mod.tags()
-        );
+        return mapEdit(logoData, mod);
     }
 
     public ModioAddModDto mapAdd(ModioMod.Local mod) throws VendorException {
-        byte[] logo;
+        byte[] logoData;
         try {
-            logo = fileService.readBytes(mod.logo());
+            logoData = fileService.readBytes(mod.logo());
         } catch (IOException e) {
-            throw new VendorException("Error reading mod logo from: " + mod.logo(),e);
+            throw new VendorException("Error reading mod logo from: " + mod.logo(), e);
         }
 
-        return new ModioAddModDto(
-            mod.name(),
-            logo,
-            mod.nameId(),
-            mod.summary(),
-            mod.description(),
-            mod.homepageUrl(),
-            mod.visible(),
-            mod.maturityOptions(),
-            mod.creditOptions(),
-            mod.communityOptions(),
-            mod.stock(),
-            mod.metadataKvp(),
-            mod.tags()
-        );
+        return mapAdd(logoData, mod);
     }
 
     @Mapping(target = "id", source = "modId")

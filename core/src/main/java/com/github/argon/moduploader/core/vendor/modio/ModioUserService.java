@@ -8,11 +8,11 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ModioUserService {
-    private final ModioUserClient modioUserClient;
-    private final ModioMapper modioMapper;
+    private final ModioUserClient userClient;
+    private final ModioMapper mapper;
 
     public ModioUser getUser(BearerToken bearerToken) {
-        ModioUserDto user = modioUserClient.getUser(bearerToken.toString());
-        return modioMapper.map(user);
+        ModioUserDto user = userClient.getUser(bearerToken.toString());
+        return mapper.map(user);
     }
 }

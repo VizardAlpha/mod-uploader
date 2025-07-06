@@ -44,7 +44,9 @@ public interface ModioModsClient {
         @Nullable @QueryParam("submitted_by") Long submittedBy,
         @Nullable @QueryParam("submitted_by_display_name") String submittedByDisplayName,
         @Nullable @QueryParam("name") String name,
-        @Nullable @QueryParam("tags") List<String> tags
+        @Nullable @QueryParam("tags") List<String> tags,
+        @Nullable @QueryParam("_offset") Integer offset,
+        @Nullable @QueryParam("_limit") Integer limit
     );
 
     /**
