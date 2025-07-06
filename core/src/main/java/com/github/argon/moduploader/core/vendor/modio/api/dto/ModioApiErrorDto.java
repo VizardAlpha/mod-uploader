@@ -5,7 +5,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.Map;
 
 @RegisterForReflection
-public record ModioErrorDto(
+public record ModioApiErrorDto(
     Error error
 ) {
     public record Error(

@@ -11,6 +11,9 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import java.util.Optional;
 
+/**
+ * For communicating with the mod.io "games" api via REST client.
+ */
 @Path("games")
 @RegisterRestClient
 @RegisterProvider(ModioDtoMapper.class) // use custom configured jackson object mapper

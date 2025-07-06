@@ -61,8 +61,8 @@ public class ModioModService {
     public ModioMod.Remote upload(Long gameId, ModioMod.Local mod, @Nullable String version, @Nullable String changelog) throws VendorException {
         BearerToken bearerToken = bearerTokenProvider.get();
 
-        if (bearerToken == null) {
-            throw new AuthException("Bearer token is null");
+        if (bearerToken == null || bearerToken.isExpired()) {
+            throw new AuthException("Bearer token is null or expired");
         }
 
         // create or update mod meta-data, such as description
@@ -86,8 +86,8 @@ public class ModioModService {
     public ModioMod.Remote update(Long gameId,ModioMod.Local mod) throws VendorException {
         BearerToken bearerToken = bearerTokenProvider.get();
 
-        if (bearerToken == null) {
-            throw new AuthException("Bearer token is null");
+        if (bearerToken == null || bearerToken.isExpired()) {
+            throw new AuthException("Bearer token is null or expired");
         }
 
         ModioEditModDto modioEditModDto = mapper.mapEdit(mod);
@@ -100,8 +100,8 @@ public class ModioModService {
     public void addModFile(Long gameId, ModioMod.Local mod, @Nullable String version, @Nullable String changelog) throws VendorException {
         BearerToken bearerToken = bearerTokenProvider.get();
 
-        if (bearerToken == null) {
-            throw new AuthException("Bearer token is null");
+        if (bearerToken == null || bearerToken.isExpired()) {
+            throw new AuthException("Bearer token is null or expired");
         }
 
         // TODO this will eat up to 500MB memory... implement multi part upload
@@ -132,8 +132,8 @@ public class ModioModService {
     public ModioMod.Remote create(Long gameId, ModioMod.Local mod) throws VendorException {
         BearerToken bearerToken = bearerTokenProvider.get();
 
-        if (bearerToken == null) {
-            throw new AuthException("Bearer token is null");
+        if (bearerToken == null || bearerToken.isExpired()) {
+            throw new AuthException("Bearer token is null or expired");
         }
 
         ModioAddModDto modioAddModDto = mapper.mapAdd(mod);
@@ -143,11 +143,11 @@ public class ModioModService {
         return mapper.map(modioModDto);
     }
 
-    public Response delete(Long gameId, Long modId) {
+    public Response archive(Long gameId, Long modId) {
         BearerToken bearerToken = bearerTokenProvider.get();
 
-        if (bearerToken == null) {
-            throw new AuthException("Bearer token is null");
+        if (bearerToken == null || bearerToken.isExpired()) {
+            throw new AuthException("Bearer token is null or expired");
         }
 
         return modioClient.archiveMod(bearerToken.toString(), gameId, modId);

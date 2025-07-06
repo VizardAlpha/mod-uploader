@@ -6,10 +6,19 @@ import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
+/**
+ * For communicating with the mod.io "oauth" api via REST client.
+ */
 @Path("oauth")
 @RegisterRestClient
 @RegisterProvider(ModioDtoMapper.class) // use custom configured jackson object mapper
 public interface ModioOAuthClient {
+
+    /**
+     * Invalidates the bearer token and logs the user out
+     *
+     * @param bearerToken to invalidate
+     */
     @POST
     @Path("/logout")
     @Produces(MediaType.APPLICATION_JSON)

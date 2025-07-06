@@ -30,7 +30,7 @@ public class ModioDeleteCommand implements Callable<Integer> {
             bearerToken = modio.authService().getBearerToken();
         }
 
-        if (!modio.deleteMod(gameId, modId)) {
+        if (!modio.archiveMod(gameId, modId)) {
             return 1;
         }
 

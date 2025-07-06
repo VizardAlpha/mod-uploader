@@ -1,10 +1,13 @@
 package com.github.argon.moduploader.core.vendor.modio.api;
 
-import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioErrorDto;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioApiErrorDto;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
+/**
+ * Handles and maps JSON api errors thrown by the mod.io
+ */
 @Provider
 public class ModioApiErrorMapper implements ResponseExceptionMapper<ModioApiException> {
 
@@ -14,7 +17,7 @@ public class ModioApiErrorMapper implements ResponseExceptionMapper<ModioApiExce
             return new ModioApiException(null, response.getStatusInfo().toEnum(), response);
         }
 
-        ModioErrorDto modioErrorDto = response.readEntity(ModioErrorDto.class);
-        return new ModioApiException(modioErrorDto, response.getStatusInfo().toEnum(), response);
+        ModioApiErrorDto modioApiErrorDto = response.readEntity(ModioApiErrorDto.class);
+        return new ModioApiException(modioApiErrorDto, response.getStatusInfo().toEnum(), response);
     }
 }

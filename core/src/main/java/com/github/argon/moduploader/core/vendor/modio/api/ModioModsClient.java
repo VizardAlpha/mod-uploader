@@ -11,11 +11,17 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * For communicating with the mod.io "mods" api via REST client.
+ */
 @Path("games")
 @RegisterRestClient
 @RegisterProvider(ModioDtoMapper.class) // use custom configured jackson object mapper
 public interface ModioModsClient {
 
+    /**
+     * For fetching information about a single mod
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{game-id}/mods/{mod-id}")
@@ -25,6 +31,10 @@ public interface ModioModsClient {
         @PathParam("mod-id") Long modId
     );
 
+    /**
+     * For fetching multiple mods filtered via given parameters.
+     * Will return all mods when all optional parameters are null.
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{game-id}/mods")
@@ -38,7 +48,7 @@ public interface ModioModsClient {
     );
 
     /**
-     * Create a new mod
+     * For create a new mod on mod.io
      *
      * @param bearerToken from the author
      * @param gameId to publish the mod for
@@ -55,6 +65,15 @@ public interface ModioModsClient {
         ModioAddModDto addModDto
     );
 
+    /**
+     * For adding files to an existing mod on mod.io
+     *
+     * @param bearerToken from the author
+     * @param gameId of the game you are modding
+     * @param modId of the mod to add the files for
+     * @param addModFileDto information and data to upload
+     * @return uploaded mod file information
+     */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)

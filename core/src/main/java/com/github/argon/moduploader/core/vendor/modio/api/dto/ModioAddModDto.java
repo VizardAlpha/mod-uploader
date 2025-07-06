@@ -12,6 +12,9 @@ import org.jboss.resteasy.reactive.RestForm;
 import java.util.List;
 
 /**
+ * For adding a new mod to mod.io
+ * Mod files will be uploaded via {@link ModioAddModFileDto}.
+ *
  * @param name Name of your mod.
  * @param nameId Path for the mod on mod.io. For example: https://mod.io/g/gamename/m/{mod-name-id-here}. If no `name_id` is specified the `name` will be used. For example: 'Stellaris Shader Mod' will become 'stellaris-shader-mod'. Cannot exceed 50 characters.
  * @param summary Summary for your mod, giving a brief overview of what it's about. Cannot exceed 250 characters.

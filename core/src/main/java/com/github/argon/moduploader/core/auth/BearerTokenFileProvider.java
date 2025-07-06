@@ -1,5 +1,6 @@
 package com.github.argon.moduploader.core.auth;
 
+import com.github.argon.moduploader.core.Clearable;
 import com.github.argon.moduploader.core.file.IFileService;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Provider;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-public class BearerTokenFileProvider implements Provider<BearerToken> {
+public class BearerTokenFileProvider implements Provider<BearerToken>, Clearable {
     private BearerToken token;
     private final Path path;
     private final IFileService fileService;
@@ -25,6 +26,11 @@ public class BearerTokenFileProvider implements Provider<BearerToken> {
         }
 
         return token;
+    }
+
+    @Override
+    public void clear() {
+        token = null;
     }
 
     @Nullable
@@ -43,8 +49,7 @@ public class BearerTokenFileProvider implements Provider<BearerToken> {
 
             return new BearerToken(tokenString, expireDate); // todo implement expire;
         } catch (Exception e) {
-            log.warn("Error while reading bearer token from {}", absolutePath, e);
-            return null;
+            throw new AuthException("Failed to read token from " + absolutePath, e);
         }
     }
 }

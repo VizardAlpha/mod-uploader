@@ -14,6 +14,9 @@ import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Handles all authentication related processes for mod.io
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class ModioAuthService {
@@ -30,17 +33,20 @@ public class ModioAuthService {
         bearerTokenConsumer.accept(bearerToken);
     }
 
-    public void logout() {
+    public boolean logout() {
         try {
             ModioLogoutDto logout = authClient.logout(getBearerToken().toString());
-            if (logout.success()) {
-                throw new AuthException("Logout failed (" + logout.code() + "): " + logout.message());
-            }
+            bearerTokenProvider.clear();
+            bearerTokenConsumer.clear();
+            return logout.success();
         } catch (ModioApiException e) {
             throw new AuthException("Logout failed", e);
         }
     }
 
+    /**
+     * Will email the user with a code for logging in
+     */
     public void requestEmailCode(String apiKey, String email) {
         try {
             ModioEmailRequestResponseDto emailRequestResponse = authClient.emailRequest(apiKey, email);
@@ -53,6 +59,10 @@ public class ModioAuthService {
         }
     }
 
+    /**
+     * Will fetch a "bearer token" to interact with the mod.io in the name of the user.
+     * The user counts as logged in when there is a valid bearer token.
+     */
     public void exchangeEmailCode(String apiKey, String emailCode) {
         try {
             ModioAccessTokenDto accessToken = authClient.emailExchange(apiKey, emailCode);
