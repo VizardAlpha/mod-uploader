@@ -1,5 +1,6 @@
 package com.github.argon.moduploader.cli.command.modio;
 
+import com.github.argon.moduploader.core.auth.BearerToken;
 import com.github.argon.moduploader.core.vendor.modio.Modio;
 import jakarta.inject.Inject;
 import picocli.CommandLine;
@@ -12,6 +13,7 @@ public class ModioDeleteCommand implements Callable<Integer> {
     ModioCommand parentCommand;
 
     @Inject Modio modio;
+    @Inject ModioLoginCommand loginCommand;
 
     @CommandLine.Option(names = {"-id", "--mod-id"}, required = true,
         description = "Id of the mod.")
@@ -20,6 +22,13 @@ public class ModioDeleteCommand implements Callable<Integer> {
     @Override
     public Integer call() {
         Long gameId = parentCommand.gameId;
+        BearerToken bearerToken = modio.authService().getBearerToken();
+
+        // force login
+        while (bearerToken == null || bearerToken.isExpired()) {
+            new CommandLine(loginCommand).execute( "-e");
+            bearerToken = modio.authService().getBearerToken();
+        }
 
         if (!modio.deleteMod(gameId, modId)) {
             return 1;

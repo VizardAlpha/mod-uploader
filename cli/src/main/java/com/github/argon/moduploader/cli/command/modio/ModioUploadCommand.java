@@ -1,5 +1,6 @@
 package com.github.argon.moduploader.cli.command.modio;
 
+import com.github.argon.moduploader.core.auth.BearerToken;
 import com.github.argon.moduploader.core.vendor.VendorException;
 import com.github.argon.moduploader.core.vendor.modio.Modio;
 import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioCommunityOptions;
@@ -20,6 +21,7 @@ public class ModioUploadCommand implements Callable<Integer> {
     ModioCommand parentCommand;
 
     @Inject Modio modio;
+    @Inject ModioLoginCommand loginCommand;
 
     @CommandLine.Option(names = {"-id", "--mod-id"},
         description = "Identifies the mod in mod.io. Will create a new mod when empty or update a mod with the given id.")
@@ -63,6 +65,14 @@ public class ModioUploadCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
+        BearerToken bearerToken = modio.authService().getBearerToken();
+
+        // force login
+        while (bearerToken == null || bearerToken.isExpired()) {
+            new CommandLine(loginCommand).execute( "-e");
+            bearerToken = modio.authService().getBearerToken();
+        }
+
         ModioMod.Local mod = new ModioMod.Local(
             modId,
             name,
