@@ -17,14 +17,15 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class Modio implements Cachable<Long> {
-    private final ModioStoreService storeService;
+    private final ModioModService modService;
     private final ModioUserService userService;
     private final ModioAuthService authService;
+    private final ModioGameService gameService;
 
     public final static String CACHE_NAME = "ModioMod.Remote";
 
-    public ModioStoreService storeService() {
-        return storeService;
+    public ModioModService modService() {
+        return modService;
     }
 
     public ModioUserService userService() {
@@ -35,35 +36,28 @@ public class Modio implements Cachable<Long> {
         return authService;
     }
 
+    public ModioGameService gameService() {
+        return gameService;
+    }
+
     public List<ModioMod.Remote> getPublishedMods(String apiKey, Long gameId, BearerToken bearerToken) {
         ModioUser modioUser = userService().getUser(bearerToken);
         Long userId = modioUser.id();
 
-        return storeService().getUserMods(apiKey, gameId, userId);
-    }
-
-    public List<ModioMod.Remote> searchMods(
-        String apiKey,
-        Long gameId,
-        @Nullable Long submittedBy,
-        @Nullable String submittedByDisplayName,
-        @Nullable String modName,
-        @Nullable List<String> tags
-    ) {
-        return storeService().searchMods(apiKey, gameId, submittedBy, submittedByDisplayName, modName, tags);
+        return modService().getUserMods(apiKey, gameId, userId);
     }
 
     @CacheResult(cacheName = CACHE_NAME)
     public List<ModioMod.Remote> getMods(String apiKey, @CacheKey Long gameId) {
-        return storeService().searchMods(apiKey, gameId, null, null, null, null);
+        return modService().getMods(apiKey, gameId, null, null, null, null);
     }
 
     public ModioMod.Remote upload(Long gameId, ModioMod.Local mod, @Nullable String version, @Nullable String changelog) throws VendorException {
-        return storeService().upload(gameId, mod, version, changelog);
+        return modService().upload(gameId, mod, version, changelog);
     }
 
     public boolean deleteMod(Long gameId, Long modId) {
-        try (Response response = storeService().delete(gameId, modId)) {
+        try (Response response = modService().delete(gameId, modId)) {
 
             if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
                 return true;

@@ -1,5 +1,6 @@
 package com.github.argon.moduploader.cli.command;
 
+import com.github.argon.moduploader.core.vendor.modio.model.ModioGame;
 import com.github.argon.moduploader.core.vendor.modio.model.ModioMod;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -8,6 +9,14 @@ import java.util.function.Function;
 
 @ApplicationScoped
 public class CliPrinter {
+
+    public void printGames(List<ModioGame> games) {
+        printTable(games, game -> new String[]{
+            game.id().toString(),
+            game.name(),
+            game.timeUpdated().toString()
+        }, "id", "name", "timeUpdated");
+    }
 
     public void printMods(List<ModioMod.Remote> mods) {
         printTable(mods, mod -> new String[]{

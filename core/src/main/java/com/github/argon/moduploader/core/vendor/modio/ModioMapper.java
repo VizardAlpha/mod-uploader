@@ -3,10 +3,8 @@ package com.github.argon.moduploader.core.vendor.modio;
 import com.github.argon.moduploader.core.file.IFileService;
 import com.github.argon.moduploader.core.vendor.CommonMapper;
 import com.github.argon.moduploader.core.vendor.VendorException;
-import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioAddModDto;
-import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioEditModDto;
-import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioModDto;
-import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioUserDto;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.*;
+import com.github.argon.moduploader.core.vendor.modio.model.ModioGame;
 import com.github.argon.moduploader.core.vendor.modio.model.ModioMod;
 import com.github.argon.moduploader.core.vendor.modio.model.ModioUser;
 import jakarta.inject.Inject;
@@ -28,6 +26,10 @@ public abstract class ModioMapper {
     abstract ModioMod.Remote map(ModioModDto data);
 
     abstract ModioUser map(ModioUserDto user);
+
+    @Mapping(target = "timeCreated", source = "dateAdded", qualifiedByName = "toInstant")
+    @Mapping(target = "timeUpdated", source = "dateUpdated", qualifiedByName = "toInstant")
+    abstract ModioGame map(ModioGameDto game);
 
     public ModioEditModDto mapEdit(ModioMod.Local mod) throws VendorException {
         byte[] logo;

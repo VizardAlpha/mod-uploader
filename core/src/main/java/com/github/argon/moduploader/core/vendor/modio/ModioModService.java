@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class ModioStoreService {
+public class ModioModService {
 
     private final ModioModsClient modioClient;
     private final ModioMapper mapper;
@@ -35,7 +35,7 @@ public class ModioStoreService {
     private final BearerTokenFileProvider bearerTokenProvider;
     private final Validator validator;
 
-    public List<ModioMod.Remote> searchMods(
+    public List<ModioMod.Remote> getMods(
         String apiKey,
         Long gameId,
         @Nullable Long submittedBy,
@@ -49,10 +49,8 @@ public class ModioStoreService {
             .toList();
     }
 
-
-
     public List<ModioMod.Remote> getUserMods(String apiKey, Long gameId, Long userId) {
-        return searchMods(apiKey, gameId, userId, null, null, null);
+        return getMods(apiKey, gameId, userId, null, null, null);
     }
 
     public Optional<ModioMod.Remote> getMod(String apiKey, Long gameId, Long modId) {

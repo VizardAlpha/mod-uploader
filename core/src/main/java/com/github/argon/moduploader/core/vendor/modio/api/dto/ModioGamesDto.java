@@ -1,0 +1,12 @@
+package com.github.argon.moduploader.core.vendor.modio.api.dto;
+
+import java.util.List;
+
+public record ModioGamesDto(
+    List<ModioGameDto> data,
+    Integer resultCount,
+    Integer resultOffset,
+    Integer resultLimit,
+    Integer resultTotal
+) {
+}

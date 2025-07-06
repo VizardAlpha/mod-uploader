@@ -25,7 +25,7 @@ public class ModioCommand {
         this.apiKey = apiKey;
     }
 
-    @CommandLine.Option(names = {"-gid", "--game-id"}, defaultValue = "0",
+    @CommandLine.Option(names = {"-gid", "--game-id"},
         description = "Id of the game you want to interact")
     public void setGameId(Long gameId) {
         this.gameId = gameId;

@@ -3,6 +3,7 @@ package com.github.argon.moduploader.core.vendor.modio;
 import com.github.argon.moduploader.core.auth.BearerTokenFileConsumer;
 import com.github.argon.moduploader.core.auth.BearerTokenFileProvider;
 import com.github.argon.moduploader.core.file.IFileService;
+import com.github.argon.moduploader.core.vendor.modio.api.ModioGameClient;
 import com.github.argon.moduploader.core.vendor.modio.api.ModioModsClient;
 import com.github.argon.moduploader.core.vendor.modio.api.ModioOAuthClient;
 import com.github.argon.moduploader.core.vendor.modio.api.ModioUserClient;
@@ -22,8 +23,13 @@ public class ModioConfiguration {
 
     @Singleton
     @Produces
-    public Modio modio(ModioStoreService storeService, ModioUserService userService, ModioAuthService authService) {
-        return new Modio(storeService, userService, authService);
+    public Modio modio(
+        ModioModService storeService,
+        ModioUserService userService,
+        ModioAuthService authService,
+        ModioGameService gameService
+    ) {
+        return new Modio(storeService, userService, authService, gameService);
     }
 
     @Singleton
@@ -61,13 +67,22 @@ public class ModioConfiguration {
 
     @Singleton
     @Produces
-    public ModioStoreService modioStoreService(
+    public ModioGameService modioGameService(
+        @RestClient ModioGameClient modioGameClient,
+        ModioMapper modioMapper
+    ) {
+        return new ModioGameService(modioGameClient, modioMapper);
+    }
+
+    @Singleton
+    @Produces
+    public ModioModService modioStoreService(
         @RestClient ModioModsClient modioModsClient,
         ModioMapper  modioMapper,
         IFileService fileService,
         BearerTokenFileProvider bearerTokenProvider,
         Validator validator
     ) {
-        return new ModioStoreService(modioModsClient, modioMapper, fileService, bearerTokenProvider, validator);
+        return new ModioModService(modioModsClient, modioMapper, fileService, bearerTokenProvider, validator);
     }
 }
