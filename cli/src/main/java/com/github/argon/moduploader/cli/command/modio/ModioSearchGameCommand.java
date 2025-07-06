@@ -31,7 +31,7 @@ public class ModioSearchGameCommand implements Callable<Integer> {
         Long gameId = parentCommand.gameId;
 
         List<ModioGame> games = modio.gameService().getGames(apiKey, gameId, ownerId, name);
-        cliPrinter.printGames(games);
+        cliPrinter.printModioGames(games);
 
         return 0;
     }

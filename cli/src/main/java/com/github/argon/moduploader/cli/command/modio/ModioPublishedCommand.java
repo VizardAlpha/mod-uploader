@@ -34,7 +34,7 @@ public class ModioPublishedCommand implements Callable<Integer> {
         Long gameId = parentCommand.gameId;
 
         List<ModioMod.Remote> publishedMods = modio.getPublishedMods(apiKey, gameId, bearerToken);
-        cliPrinter.printMods(publishedMods);
+        cliPrinter.printModioMods(publishedMods);
 
         return 0;
     }

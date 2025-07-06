@@ -2,6 +2,7 @@ package com.github.argon.moduploader.cli.command;
 
 import com.github.argon.moduploader.core.vendor.modio.model.ModioGame;
 import com.github.argon.moduploader.core.vendor.modio.model.ModioMod;
+import com.github.argon.moduploader.core.vendor.steam.model.SteamMod;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.function.Function;
 @ApplicationScoped
 public class CliPrinter {
 
-    public void printGames(List<ModioGame> games) {
+    public void printModioGames(List<ModioGame> games) {
         printTable(games, game -> new String[]{
             game.id().toString(),
             game.name(),
@@ -18,7 +19,7 @@ public class CliPrinter {
         }, "id", "name", "timeUpdated");
     }
 
-    public void printMods(List<ModioMod.Remote> mods) {
+    public void printModioMods(List<ModioMod.Remote> mods) {
         printTable(mods, mod -> new String[]{
             mod.id().toString(),
             mod.name(),
@@ -26,6 +27,15 @@ public class CliPrinter {
             mod.ownerId().toString(),
             mod.timeUpdated().toString()
         }, "id", "name", "owner", "ownerId", "timeUpdated");
+    }
+
+    public void printSteamMods(List<SteamMod.Remote> mods) {
+        printTable(mods, mod -> new String[]{
+            (mod.id() != null) ? mod.id().toString() : "null",
+            mod.name(),
+            mod.ownerId().toString(),
+            mod.timeUpdated().toString(),
+        }, "id", "name", "ownerId", "timeUpdated");
     }
 
     public <T> void printTable(List<T> rows, Function<T, String[]> mapper, String... headers) {

@@ -38,7 +38,7 @@ public class ModioSearchModCommand implements Callable<Integer> {
         Long gameId = parentCommand.gameId;
 
         List<ModioMod.Remote> mods = modio.modService().getMods(apiKey, gameId, ownerId, ownerName, name, tags);
-        cliPrinter.printMods(mods);
+        cliPrinter.printModioMods(mods);
 
         return 0;
     }
