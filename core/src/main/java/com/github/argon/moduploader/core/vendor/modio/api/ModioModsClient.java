@@ -86,22 +86,29 @@ public interface ModioModsClient {
         ModioEditModDto editModDto
     );
 
-
-
     /**
-     * Deletes a mod
+     * Archives a mod
      *
      * @param bearerToken from the author
-     * @param gameId to delete the mod from
+     * @param gameId to archive the mod from
      * @param modId of the mod to delete
      * @return a response with 204 No Content
      */
     @DELETE
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED) // seems ignored when there's no content / body
     @Path("/{game-id}/mods/{mod-id}")
-    Response deleteMod(
+    Response archiveMod(
+        @HeaderParam("Content-Type") String contentType, // force the header to be set
         @HeaderParam("Authorization") String bearerToken,
         @PathParam("game-id") Long gameId,
         @PathParam("mod-id") Long modId
     );
+
+    default Response archiveMod(
+         String bearerToken,
+         Long gameId,
+         Long modId
+    ) {
+        return archiveMod(MediaType.APPLICATION_FORM_URLENCODED, bearerToken, gameId, modId);
+    }
 }

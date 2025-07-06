@@ -150,6 +150,6 @@ public class ModioModService {
             throw new AuthException("Bearer token is null");
         }
 
-        return modioClient.deleteMod(bearerToken.toString(), gameId, modId);
+        return modioClient.archiveMod(bearerToken.toString(), gameId, modId);
     }
 }
