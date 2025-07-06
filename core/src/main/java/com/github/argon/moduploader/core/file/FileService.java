@@ -1,26 +1,38 @@
 package com.github.argon.moduploader.core.file;
 
+import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
 import jakarta.annotation.Nullable;
-import jakarta.enterprise.context.ApplicationScoped;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Simple service for handling file operations.
  */
 @Slf4j
-@ApplicationScoped
+@RequiredArgsConstructor
 public class FileService extends AbstractFileService {
     public final static Charset CHARSET = StandardCharsets.UTF_8;
     public final static Path TEMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
+    private final JavaPropsMapper javaPropsMapper;
+
+    @Override
+    public <T> void writeAsProperties(Path path, T pojo) throws IOException {
+        Path absolutePath = path.toAbsolutePath();
+        Properties properties = javaPropsMapper.writeValueAsProperties(pojo);
+        OutputStream outputStream = Files.newOutputStream(absolutePath);
+        properties.store(outputStream, pojo.getClass().getName());
+    }
 
     @Override
     public Path zip(Path path) throws IOException {

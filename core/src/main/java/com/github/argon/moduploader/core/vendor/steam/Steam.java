@@ -51,7 +51,7 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
     }
 
     /**
-     *
+     * Will throw away all open steam handlers
      */
     @Override
     public void close() {
@@ -66,6 +66,7 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
      */
     @Override
     public boolean init(Integer appId) throws InitializeException {
+        log.debug("Initializing SteamAPI with appId: {}", appId);
         initSteamAppId(appId);
         initSteamNativeApi();
 
@@ -135,12 +136,12 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
      * The {@link SteamAPI} requires a file named like {@link Steam#STEAM_APP_ID_TXT}
      * with the app id of the game you want to work with.
      *
-     *
      * @param appId to write into the file
      * @throws InitializeException when writing the file fails
      */
     private void initSteamAppId(Integer appId) throws InitializeException {
         Path steamAppIdTxtPath = Paths.get(steamAppIdTxt);
+        log.debug("Writing steam app id {} into {}", appId, steamAppIdTxtPath);
 
         try {
             fileService.write(steamAppIdTxtPath, appId.toString());
@@ -149,14 +150,27 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
         }
     }
 
+    /**
+     * For initializing the {@link SteamAPI} library.
+     * This requires a "steam_appid.txt" file with an existing and valid "appid" in it.
+     *
+     * @throws InitializeException when loading the native libraries or {@link SteamAPI} initialization fails
+     */
     private void initSteamNativeApi() throws InitializeException {
+        log.debug("Initializing Steam native libraries and API");
         try {
             SteamAPI.loadLibraries();
             if (!SteamAPI.init()) {
-                throw new InitializeException("Steamworks initialization error, e.g. Steam client not running");
+                throw new InitializeException("""
+                    SteamAPI initialization error. This could be because:
+                    * Steam client is not running
+                    * steam_appid.txt is not next to the executed app
+                    * steam_appid.txt is empty
+                    * steam_appid.txt contains a not existing or invalid app id
+                    """);
             }
         } catch (SteamException e) {
-            throw new InitializeException("Error extracting or loading native Steam libraries", e);
+            throw new InitializeException("Error extracting or loading native SteamAPI libraries", e);
         }
     }
 }

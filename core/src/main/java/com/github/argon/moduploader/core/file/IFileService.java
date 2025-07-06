@@ -12,6 +12,19 @@ import java.util.List;
 public interface IFileService {
 
     /**
+     * For writing any kind of data object as properties into a file.
+     * <pre>
+     *     boo.far=123
+     * </pre>
+     *
+     * @param path where to write the property file
+     * @param pojo with the data to write
+     * @param <T> of the given pojo
+     * @throws IOException when writing the file fails
+     */
+    <T> void writeAsProperties(Path path, T pojo) throws IOException;
+
+    /**
      * Reads content as lines from file in given path.
      *
      * @param path of file to read from
