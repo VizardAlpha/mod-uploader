@@ -1,5 +1,7 @@
 package com.github.argon.moduploader.core.vendor.modio.api.dto;
 
+import com.github.argon.moduploader.core.vendor.modio.model.ModioVisibility;
+
 import java.util.List;
 
 public record ModioModDto(

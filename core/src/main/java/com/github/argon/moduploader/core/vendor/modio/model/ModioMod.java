@@ -1,6 +1,5 @@
 package com.github.argon.moduploader.core.vendor.modio.model;
 
-import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioVisibility;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
@@ -16,8 +15,8 @@ public record ModioMod() {
         Long ownerId,
         String description,
         Integer gameId,
-        Integer status,
-        Integer visible,
+        ModioStatus status,
+        ModioVisibility visible,
         Instant timeCreated,
         Instant timeUpdated
     ){}

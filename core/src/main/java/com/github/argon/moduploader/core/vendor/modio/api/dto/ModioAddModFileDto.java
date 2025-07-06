@@ -1,5 +1,6 @@
 package com.github.argon.moduploader.core.vendor.modio.api.dto;
 
+import com.github.argon.moduploader.core.vendor.modio.model.ModioTargetPlatforms;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

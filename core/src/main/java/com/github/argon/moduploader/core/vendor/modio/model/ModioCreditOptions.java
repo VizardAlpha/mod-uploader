@@ -1,4 +1,4 @@
-package com.github.argon.moduploader.core.vendor.modio.api.dto;
+package com.github.argon.moduploader.core.vendor.modio.model;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -4,7 +4,7 @@ import java.time.Instant;
 
 public record ModioGame(
     Long id,
-    Integer status,
+    ModioStatus status,
     String name,
     String nameId,
     String summary,

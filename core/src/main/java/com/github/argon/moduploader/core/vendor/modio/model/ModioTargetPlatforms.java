@@ -1,4 +1,4 @@
-package com.github.argon.moduploader.core.vendor.modio.api.dto;
+package com.github.argon.moduploader.core.vendor.modio.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

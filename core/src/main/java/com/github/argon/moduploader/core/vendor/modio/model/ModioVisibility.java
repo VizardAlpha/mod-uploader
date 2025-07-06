@@ -1,21 +1,20 @@
-package com.github.argon.moduploader.core.vendor.modio.api.dto;
+package com.github.argon.moduploader.core.vendor.modio.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 
-public enum ModioGameStatus {
-    NOT_ACCEPTED(0),
-    ACCEPTED(1),
-    DELETED(3);
+public enum ModioVisibility {
+    VISIBLE(0),
+    HIDDEN(1);
 
     @Getter
     @JsonValue
     private final int value;
 
     @JsonCreator
-    ModioGameStatus(int value) {
+    ModioVisibility(int value) {
         this.value = value;
     }
 }
