@@ -42,7 +42,7 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
      */
     public Steam(Integer appId, FileService fileService, String steamAppIdTxt) throws InitializeException {
         this.steamAppIdTxt = steamAppIdTxt;
-        this.fileService = fileService;
+        this.fileService = fileService != null ? fileService : new FileService();
 
         init(appId);
     }

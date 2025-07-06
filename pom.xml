@@ -3,8 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.argon.moduploader</groupId>
     <artifactId>root</artifactId>
-    <version>local</version>
+    <version>0.1.0</version>
     <packaging>pom</packaging>
+
+    <name>Mod Uploader</name>
+    <description>A tool for uploading mods to various platforms</description>
+    <organization>
+        <name>Argon</name>
+        <url>https://github.com/argon</url>
+    </organization>
+    <inceptionYear>2023</inceptionYear>
 
     <modules>
         <module>cli</module>
