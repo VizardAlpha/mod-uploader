@@ -23,10 +23,12 @@ public class CliPrinter {
         printTable(mods, mod -> new String[]{
             mod.id().toString(),
             mod.name(),
+            mod.status().toString(),
+            mod.visible().toString(),
             mod.owner(),
             mod.ownerId().toString(),
             mod.timeUpdated().toString()
-        }, "id", "name", "owner", "ownerId", "timeUpdated");
+        }, "id", "name", "status", "visible", "owner", "ownerId", "timeUpdated");
     }
 
     public void printSteamMods(List<SteamMod.Remote> mods) {

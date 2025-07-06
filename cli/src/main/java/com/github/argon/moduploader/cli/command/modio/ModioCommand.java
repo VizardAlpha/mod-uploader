@@ -19,7 +19,7 @@ public class ModioCommand {
     String apiKey;
     Long gameId;
 
-    @CommandLine.Option(names = {"-key", "--api-key"}, required = true,
+    @CommandLine.Option(names = {"-key", "--api-key"},
         description = "The mod.io api access key. You can create a key in your mod.io profile")
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;

@@ -27,11 +27,13 @@ public class FileService extends AbstractFileService {
     private final JavaPropsMapper javaPropsMapper;
 
     @Override
-    public <T> void writeAsProperties(Path path, T pojo) throws IOException {
+    public <T> Path writeAsProperties(Path path, T pojo) throws IOException {
         Path absolutePath = path.toAbsolutePath();
         Properties properties = javaPropsMapper.writeValueAsProperties(pojo);
         OutputStream outputStream = Files.newOutputStream(absolutePath);
+
         properties.store(outputStream, pojo.getClass().getName());
+        return absolutePath;
     }
 
     @Override
@@ -111,7 +113,7 @@ public class FileService extends AbstractFileService {
      *
      * @throws IOException if something goes wrong when writing the file
      */
-    public void write(Path path, String content) throws IOException {
+    public Path write(Path path, String content) throws IOException {
         Path absolutePath = path.toAbsolutePath();
         log.debug("Writing into file {}", absolutePath);
         File parentDirectory = absolutePath.getParent().toFile();
@@ -131,6 +133,8 @@ public class FileService extends AbstractFileService {
             log.error("Could not write into {}", absolutePath);
             throw e;
         }
+
+        return absolutePath;
     }
 
     /**
