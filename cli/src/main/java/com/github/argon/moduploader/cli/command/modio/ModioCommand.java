@@ -32,7 +32,7 @@ public class ModioCommand {
     }
 
     @PostConstruct
-    public void init() {
+    public void postConstruct() {
         if (apiKey == null) {
             apiKey = modioProperties.apiKey().orElse(null);
         }

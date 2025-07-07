@@ -18,13 +18,14 @@ public class EntryCommand implements Runnable, QuarkusApplication {
     CommandLine.IFactory cliFactory;
 
     @Override
-    public void run() {
-
-    }
+    public void run() {}
 
     @Override
     public int run(String... args) throws Exception {
         return new CommandLine(this, cliFactory)
+            // PicoCLI will only run the last sub command in the chain by default.
+            // We want to execute all of them!
+            .setExecutionStrategy(new CommandLine.RunAll())
             .execute(args);
     }
 }

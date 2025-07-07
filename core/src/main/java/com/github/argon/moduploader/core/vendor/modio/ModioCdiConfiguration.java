@@ -8,16 +8,21 @@ import com.github.argon.moduploader.core.vendor.modio.api.ModioModsClient;
 import com.github.argon.moduploader.core.vendor.modio.api.ModioOAuthClient;
 import com.github.argon.moduploader.core.vendor.modio.api.ModioUserClient;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.Validator;
-import jakarta.ws.rs.Produces;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.nio.file.Path;
 
+/**
+ * Contexts and Dependency Injection config for Quarkus
+ * Here the code for gluing all the classes needed for mod.io together lives.
+ *
+ */
 @ApplicationScoped
-public class ModioConfiguration {
+public class ModioCdiConfiguration {
     @Inject
     ModioProperties modioProperties;
 

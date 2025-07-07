@@ -4,11 +4,11 @@ import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
 import com.github.argon.moduploader.core.file.FileService;
 import com.github.argon.moduploader.core.file.IFileService;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.Produces;
 
 @ApplicationScoped
-public class CoreConfiguration {
+public class CoreCdiConfiguration {
 
     @Produces
     @Singleton

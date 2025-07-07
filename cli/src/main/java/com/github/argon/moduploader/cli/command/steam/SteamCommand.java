@@ -1,11 +1,14 @@
 package com.github.argon.moduploader.cli.command.steam;
 
+import com.github.argon.moduploader.core.vendor.steam.Steam;
 import com.github.argon.moduploader.core.vendor.steam.SteamProperties;
+import io.quarkus.arc.Unremovable;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import picocli.CommandLine;
 
+@Unremovable
 @ApplicationScoped
 @CommandLine.Command(name = "steam", mixinStandardHelpOptions = true, subcommands = {
     SteamUploadCommand.class,
@@ -14,8 +17,9 @@ import picocli.CommandLine;
     SteamSearchModCommand.class,
     SteamDeleteCommand.class
 })
-public class SteamCommand {
+public class SteamCommand implements Runnable {
     @Inject SteamProperties steamProperties;
+    @Inject Steam steam;
 
     Integer appId;
     String apiKey;
@@ -33,9 +37,14 @@ public class SteamCommand {
     }
 
     @PostConstruct
-    public void init() {
+    public void postConstruct() {
         if (apiKey == null) {
             apiKey = steamProperties.apiKey().orElse(null);
         }
+    }
+
+    @Override
+    public void run() {
+        steam.init(appId);
     }
 }

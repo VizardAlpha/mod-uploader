@@ -8,9 +8,6 @@ import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "logout", description = "Will invalidate the current user token and logs you out.")
 public class ModioLogoutCommand implements Callable<Integer> {
-    @CommandLine.ParentCommand
-    ModioCommand parentCommand;
-
     @Inject Modio modio;
 
     @Override
