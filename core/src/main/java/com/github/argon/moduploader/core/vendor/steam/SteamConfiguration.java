@@ -12,7 +12,13 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
  * Here the code for gluing all the classes needed for Steam together lives.
  */
 @ApplicationScoped
-public class SteamCdiConfiguration {
+public class SteamConfiguration {
+    public final static String REMOTE_MOD_CACHE = "SteamMod.Remote";
+    public final static String STEAM_APP_ID_TXT = "steam_appid.txt";
+    public final static Integer DEFAULT_APP_ID = 480;
+    public final static String DEFAULT_APP_ID_STRING = "480";
+
+
     @Produces
     @Singleton
     public Steam steam(

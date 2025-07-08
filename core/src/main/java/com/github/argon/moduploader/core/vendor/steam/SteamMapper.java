@@ -8,6 +8,8 @@ import com.github.argon.moduploader.core.vendor.steam.model.SteamMod;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 /**
  * The {@link com.codedisaster.steamworks.SteamAPI} conflicts with Mapstruct.
  * Mapstruct will try to read the Steam Objects on compile time,
@@ -23,7 +25,7 @@ public class SteamMapper {
         return new SteamMod.Remote(
             toLong(details.getPublishedFileID()),
             details.getTitle(),
-            commonMapper.toList(details.getTags()),
+            (details.getTags() == null) ? List.of() : commonMapper.toList(details.getTags()),
             details.getDescription(),
             details.getFileSize(),
             details.getOwnerID().getAccountID(),

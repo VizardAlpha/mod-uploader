@@ -1,6 +1,7 @@
 package com.github.argon.moduploader.cli.command.steam;
 
 import com.github.argon.moduploader.core.vendor.steam.Steam;
+import com.github.argon.moduploader.core.vendor.steam.SteamConfiguration;
 import com.github.argon.moduploader.core.vendor.steam.SteamProperties;
 import io.quarkus.arc.Unremovable;
 import jakarta.annotation.PostConstruct;
@@ -30,7 +31,7 @@ public class SteamCommand implements Runnable {
         this.apiKey = apiKey;
     }
 
-    @CommandLine.Option(names = {"-app", "--app-id"}, defaultValue = "480",
+    @CommandLine.Option(names = {"-app", "--app-id"}, defaultValue = SteamConfiguration.DEFAULT_APP_ID_STRING,
         description = "The Steam app id of the game you want to upload a mod to.")
     public void setAppId(Integer appId) {
         this.appId = appId;

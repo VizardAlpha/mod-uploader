@@ -1,9 +1,8 @@
 package com.github.argon.moduploader.cli.command.steam;
 
 import com.codedisaster.steamworks.SteamRemoteStorage;
+import com.github.argon.moduploader.cli.command.CliPrinter;
 import com.github.argon.moduploader.core.vendor.steam.Steam;
-import com.github.argon.moduploader.core.vendor.steam.SteamMapper;
-import com.github.argon.moduploader.core.vendor.steam.SteamWorkshopService;
 import com.github.argon.moduploader.core.vendor.steam.model.SteamMod;
 import jakarta.inject.Inject;
 import picocli.CommandLine;
@@ -15,7 +14,7 @@ import java.util.List;
 @CommandLine.Command(name = "upload", description = "Upload a mod to the Steam Workshop. Prints the published file id of the mod.")
 public class SteamUploadCommand implements Runnable {
     @Inject Steam steam;
-    @Inject SteamMapper mapper;
+    @Inject CliPrinter cliPrinter;
 
     @CommandLine.Option(names = {"-id", "--published-file-id"},
         description = "Identifies the mod in the Steam Workshop. Will create a new mod when empty or update a mod with the given id.")
@@ -52,8 +51,7 @@ public class SteamUploadCommand implements Runnable {
     @Override
     public void run() {
         try {
-            SteamWorkshopService workshop = steam.workshop();
-            workshop.upload(
+            steam.workshop().upload(
                 new SteamMod.Local(
                     publishedFileId,
                     name,
@@ -64,11 +62,13 @@ public class SteamUploadCommand implements Runnable {
                 ),
                 visibility,
                 changelog,
-                (steamPublishedFileID, steamResult) ->
-                    System.out.println(mapper.toLong(steamPublishedFileID))
+                (modId, uploadResult) -> {
+                    steam.workshop().getMod(modId, (mod, modResult) -> {
+                        cliPrinter.printSteamMod(mod);
+                    });
+                }
             );
-
-            steam.block();
+            steam.awaits();
         } catch (Exception e) {
             // TODO better exceptions
             throw new RuntimeException(e);

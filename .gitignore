@@ -47,3 +47,4 @@ cli/.env
 # mod-uploader
 steam_appid.txt
 *.token
+*.mv.db

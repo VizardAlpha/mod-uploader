@@ -3,17 +3,17 @@ package com.github.argon.moduploader.core.auth;
 import com.github.argon.moduploader.core.Clearable;
 import com.github.argon.moduploader.core.file.IFileService;
 import jakarta.annotation.Nullable;
-import jakarta.inject.Provider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Slf4j
 @RequiredArgsConstructor
-public class BearerTokenFileProvider implements Provider<BearerToken>, Clearable {
+public class BearerTokenFileProvider implements Supplier<BearerToken>, Clearable {
     private BearerToken token;
     private final Path path;
     private final IFileService fileService;

@@ -22,7 +22,9 @@ import java.nio.file.Path;
  *
  */
 @ApplicationScoped
-public class ModioCdiConfiguration {
+public class ModioConfiguration {
+    public final static String REMOTE_MOD_CACHE = "ModioMod.Remote";
+
     @Inject
     ModioProperties modioProperties;
 

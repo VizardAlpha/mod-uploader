@@ -2,12 +2,13 @@ package com.github.argon.moduploader.core.vendor.steam.model;
 
 import jakarta.annotation.Nullable;
 
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 
 public record SteamMod() {
-    public record Remote(
+    public record Remote (
         @Nullable Long id,
         String name,
         List<String> tags,
@@ -18,7 +19,7 @@ public record SteamMod() {
         Instant timeUpdated,
         Integer votesUp,
         Integer votesDown
-    ){}
+    ) implements Serializable {}
 
     public record Local(
         @Nullable Long id,

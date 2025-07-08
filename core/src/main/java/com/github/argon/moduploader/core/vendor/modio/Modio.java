@@ -26,8 +26,6 @@ public class Modio implements Cachable<Long> {
     private final ModioAuthService authService;
     private final ModioGameService gameService;
 
-    public final static String CACHE_NAME = "ModioMod.Remote";
-
     public ModioModService modService() {
         return modService;
     }
@@ -58,7 +56,7 @@ public class Modio implements Cachable<Long> {
      * Fetches all mods from a game.
      * Results will be cached by the gameId.
      */
-    @CacheResult(cacheName = CACHE_NAME)
+    @CacheResult(cacheName = ModioConfiguration.REMOTE_MOD_CACHE)
     public List<ModioMod.Remote> getMods(String apiKey, @CacheKey Long gameId) {
         return modService().getMods(apiKey, gameId, null, null, null, null);
     }
@@ -95,13 +93,13 @@ public class Modio implements Cachable<Long> {
      * Removes entries with given gameId from cache
      */
     @Override
-    @CacheInvalidate(cacheName = CACHE_NAME)
+    @CacheInvalidate(cacheName = ModioConfiguration.REMOTE_MOD_CACHE)
     public void invalidate(@CacheKey Long gameId) {}
 
     /**
      * Removes all entries from cache
      */
     @Override
-    @CacheInvalidateAll(cacheName = CACHE_NAME)
+    @CacheInvalidateAll(cacheName = ModioConfiguration.REMOTE_MOD_CACHE)
     public void invalidateAll() {}
 }

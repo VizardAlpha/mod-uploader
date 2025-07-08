@@ -2,12 +2,14 @@ package com.github.argon.moduploader.core.vendor.steam;
 
 import com.codedisaster.steamworks.SteamAPI;
 import com.codedisaster.steamworks.SteamException;
-import com.github.argon.moduploader.core.Blockable;
+import com.github.argon.moduploader.core.Awaitable;
 import com.github.argon.moduploader.core.Initializable;
 import com.github.argon.moduploader.core.InitializeException;
 import com.github.argon.moduploader.core.NotInitializedException;
 import com.github.argon.moduploader.core.file.IFileService;
 import com.github.argon.moduploader.core.vendor.steam.api.SteamStoreClient;
+import com.github.argon.moduploader.core.vendor.steam.api.SteamUserHandler;
+import com.github.argon.moduploader.core.vendor.steam.api.SteamWorkshopHandler;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,27 +25,33 @@ import java.time.Instant;
  * Contains all logic to initialize the native {@link SteamAPI}.
  */
 @Slf4j
-public class Steam implements Closeable, Blockable, Runnable, Initializable<Integer> {
-    public static final String STEAM_APP_ID_TXT = "steam_appid.txt";
+public class Steam implements Closeable, Awaitable, Runnable, Initializable<Integer> {
+
 
     @Getter
     private final String steamAppIdTxt;
     private SteamWorkshopService workshop;
-
-
+    private Integer appId = SteamConfiguration.DEFAULT_APP_ID;
     private final IFileService fileService;
     private final SteamStoreClient storeClient;
     private final SteamMapper mapper;
 
     public Steam(IFileService fileService, SteamStoreClient storeClient, SteamMapper mapper) {
-        this(fileService, STEAM_APP_ID_TXT, storeClient, mapper);
+        this(SteamConfiguration.STEAM_APP_ID_TXT, fileService, storeClient, mapper);
     }
+
+
 
     /**
      * @param fileService for writing the steamAppIdTxt
      * @param steamAppIdTxt name of the steam appid txt file, which needs to be present next to this app
      */
-    public Steam(IFileService fileService, String steamAppIdTxt, SteamStoreClient storeClient, SteamMapper mapper) {
+    public Steam(
+        String steamAppIdTxt,
+        IFileService fileService,
+        SteamStoreClient storeClient,
+        SteamMapper mapper
+    ) {
         this.steamAppIdTxt = steamAppIdTxt;
         this.fileService = fileService;
         this.mapper = mapper;
@@ -56,6 +64,14 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
         }
 
         return workshop;
+    }
+
+    public Integer appId() {
+        if (appId == null) {
+            throw new NotInitializedException("You have to call Steam.init(appId) first");
+        }
+
+        return appId;
     }
 
     /**
@@ -87,7 +103,8 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
         initSteamAppId(appId);
         initSteamNativeApi(appId);
 
-        workshop = new SteamWorkshopService(appId, mapper);
+        workshop = new SteamWorkshopService(new SteamWorkshopHandler(appId), mapper, new SteamUserHandler());
+        this.appId = appId;
 
         return true;
     }
@@ -98,7 +115,7 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
      * @param timeout optional for ending the loop after a certain duration
      */
     @Override
-    public void block(@Nullable Duration timeout) {
+    public void awaits(@Nullable Duration timeout) {
         Instant end = null;
         if (timeout != null) {
             end = Instant.now().plus(timeout);
@@ -145,7 +162,7 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
     }
 
     /**
-     * The {@link SteamAPI} requires a file named like {@link Steam#STEAM_APP_ID_TXT}
+     * The {@link SteamAPI} requires a file named like {@link SteamConfiguration#STEAM_APP_ID_TXT}
      * with the app id of the game you want to work with.
      *
      * @param appId to write into the file

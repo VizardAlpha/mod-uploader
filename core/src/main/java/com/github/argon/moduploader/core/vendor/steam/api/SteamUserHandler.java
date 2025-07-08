@@ -1,4 +1,4 @@
-package com.github.argon.moduploader.core.vendor.steam;
+package com.github.argon.moduploader.core.vendor.steam.api;
 
 import com.codedisaster.steamworks.*;
 
@@ -7,11 +7,11 @@ import java.io.Closeable;
 /**
  * For interacting with the Steam user
  */
-public class SteamUserService implements Closeable {
+public class SteamUserHandler implements Closeable {
 
     private final com.codedisaster.steamworks.SteamUser steamUser;
 
-    public SteamUserService() {
+    public SteamUserHandler() {
         steamUser = new com.codedisaster.steamworks.SteamUser(new Callback());
     }
 
