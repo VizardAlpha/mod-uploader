@@ -13,13 +13,8 @@ public class SteamPublishedCommand implements Runnable {
 
     @Override
     public void run() {
-        try {
-            steam.workshop().getPublishedMods((publishedMods, result)
-                -> cliPrinter.printSteamMods(publishedMods));
-            steam.awaits();
-        } catch (Exception e) {
-            // TODO better exceptions
-            throw new RuntimeException(e);
-        }
+        steam.workshop().getPublishedMods((publishedMods, result)
+            -> cliPrinter.printSteamMods(publishedMods));
+        steam.awaits();
     }
 }

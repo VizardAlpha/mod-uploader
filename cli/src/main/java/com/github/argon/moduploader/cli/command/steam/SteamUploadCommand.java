@@ -16,9 +16,9 @@ public class SteamUploadCommand implements Runnable {
     @Inject Steam steam;
     @Inject CliPrinter cliPrinter;
 
-    @CommandLine.Option(names = {"-id", "--published-file-id"},
+    @CommandLine.Option(names = {"-id", "--mod-id"},
         description = "Identifies the mod in the Steam Workshop. Will create a new mod when empty or update a mod with the given id.")
-    Long publishedFileId;
+    Long modId;
 
     @CommandLine.Option(names = {"-n", "--name"}, required = true,
         description = "Title of your mod.")
@@ -50,28 +50,23 @@ public class SteamUploadCommand implements Runnable {
 
     @Override
     public void run() {
-        try {
-            steam.workshop().upload(
-                new SteamMod.Local(
-                    publishedFileId,
-                    name,
-                    description,
-                    tags,
-                    contentFolder.toAbsolutePath(),
-                    previewImage.toAbsolutePath()
-                ),
-                visibility,
-                changelog,
-                (modId, uploadResult) -> {
-                    steam.workshop().getMod(modId, (mod, modResult) -> {
-                        cliPrinter.printSteamMod(mod);
-                    });
-                }
-            );
-            steam.awaits();
-        } catch (Exception e) {
-            // TODO better exceptions
-            throw new RuntimeException(e);
-        }
+        steam.workshop().upload(
+            new SteamMod.Local(
+                modId,
+                name,
+                description,
+                tags,
+                contentFolder.toAbsolutePath(),
+                previewImage.toAbsolutePath()
+            ),
+            visibility,
+            changelog,
+            (modId, uploadResult) -> {
+                steam.workshop().getMod(modId, (mod, modResult) -> {
+                    cliPrinter.printSteamMod(mod);
+                });
+            }
+        );
+        steam.awaits();
     }
 }

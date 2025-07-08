@@ -26,6 +26,8 @@ public class SteamWorkshopHandler extends SteamCallback implements Closeable {
     private BiConsumer<SteamPublishedFileID, SteamResult> updateHandler = null;
     @Nullable
     private BiConsumer<SteamPublishedFileID, SteamResult> creationHandler = null;
+    @Nullable
+    private BiConsumer<SteamPublishedFileID, SteamResult> deleteHandler = null;
     private final Map<SteamQuery, SteamResults> queryHandlers = new HashMap<>();
     private final Map<SteamUGCQuery, SteamQuery> queryToQuery = new HashMap<>();
 
@@ -81,6 +83,11 @@ public class SteamWorkshopHandler extends SteamCallback implements Closeable {
         workshop.setItemVisibility(steamUpdateHandle, visibility);
 
         workshop.submitItemUpdate(steamUpdateHandle, changelog);
+    }
+
+    public void deleteMod(SteamPublishedFileID modId, BiConsumer<SteamPublishedFileID, SteamResult> deleteHandler) {
+        this.deleteHandler = deleteHandler;
+        workshop.deleteItem(modId);
     }
 
     public void getMod(SteamPublishedFileID modId, BiConsumer<List<SteamUGCDetails>, SteamResult> modsHandler) {
@@ -147,12 +154,13 @@ public class SteamWorkshopHandler extends SteamCallback implements Closeable {
     }
 
     public boolean hasHandlers() {
-        return !queryHandlers.isEmpty() || creationHandler != null || updateHandler != null;
+        return !queryHandlers.isEmpty() || creationHandler != null || updateHandler != null || deleteHandler != null;
     }
 
     public void clearHandlers() {
         creationHandler = null;
         updateHandler = null;
+        deleteHandler = null;
         queryHandlers.clear();
     }
 
@@ -243,6 +251,21 @@ public class SteamWorkshopHandler extends SteamCallback implements Closeable {
         // generate a query for the next page
         steamResults.getQuery().next();
         send(steamResults.getQuery(), steamResults.getCallback());
+    }
+
+    @Override
+    public void onDeleteItem(SteamPublishedFileID publishedFileID, SteamResult result) {
+        if (result != SteamResult.OK) {
+            log.warn("Delete workshop item failed: {}", result);
+        }
+
+        if (deleteHandler == null) {
+            log.info("No handler for mod delete registered");
+            return;
+        }
+
+        deleteHandler.accept(publishedFileID, result);
+        deleteHandler = null;
     }
 
     @Getter

@@ -111,6 +111,12 @@ public class SteamWorkshopService implements Closeable {
         });
     }
 
+    public void deleteMod(@NonNull Long modId, BiConsumer<Long, SteamResult> deleteHandler) {
+        workshop.deleteMod(new SteamPublishedFileID(modId), (deletedModId, result) -> {
+            deleteHandler.accept(mapper.toLong(deletedModId), result);
+        });
+    }
+
     public void getMods(BiConsumer<List<SteamMod.Remote>, SteamResult> modsHandler) {
         workshop.getMods((steamUGCDetailsList, result) -> {
             List<SteamMod.Remote> mods = steamUGCDetailsList.stream()
