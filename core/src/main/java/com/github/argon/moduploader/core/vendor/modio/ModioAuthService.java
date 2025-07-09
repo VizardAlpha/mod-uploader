@@ -2,34 +2,52 @@ package com.github.argon.moduploader.core.vendor.modio;
 
 import com.github.argon.moduploader.core.auth.AuthException;
 import com.github.argon.moduploader.core.auth.BearerToken;
-import com.github.argon.moduploader.core.vendor.modio.client.ModioApiException;
-import com.github.argon.moduploader.core.vendor.modio.client.ModioOAuthClient;
-import com.github.argon.moduploader.core.vendor.modio.client.dto.*;
-import jakarta.inject.Provider;
+import com.github.argon.moduploader.core.auth.BearerTokenFileConsumer;
+import com.github.argon.moduploader.core.auth.BearerTokenFileProvider;
+import com.github.argon.moduploader.core.vendor.modio.api.ModioApiException;
+import com.github.argon.moduploader.core.vendor.modio.api.ModioOAuthClient;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioAccessTokenDto;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioEmailRequestResponseDto;
+import com.github.argon.moduploader.core.vendor.modio.api.dto.ModioLogoutDto;
+import jakarta.annotation.Nullable;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.function.Consumer;
-
+/**
+ * Handles all authentication related processes for mod.io
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class ModioAuthService {
-    private final String apiKey;
     private final ModioOAuthClient authClient;
+    private final BearerTokenFileProvider bearerTokenProvider;
+    private final BearerTokenFileConsumer bearerTokenConsumer;
 
-    public void logout(Provider<BearerToken> bearerTokenProvider) {
+    @Nullable
+    public BearerToken getBearerToken() {
+        return bearerTokenProvider.get();
+    }
+
+    public void setBearerToken(BearerToken bearerToken) {
+        bearerTokenConsumer.accept(bearerToken);
+    }
+
+    public boolean logout() {
         try {
-            LogoutDto logout = authClient.logout(bearerTokenProvider.get().toString());
-            if (logout.success()) {
-                throw new AuthException("Logout failed (" + logout.code() + "): " + logout.message());
-            }
+            ModioLogoutDto logout = authClient.logout(getBearerToken().toString());
+            bearerTokenProvider.clear();
+            bearerTokenConsumer.clear();
+            return logout.success();
         } catch (ModioApiException e) {
             throw new AuthException("Logout failed", e);
         }
     }
 
-    public void requestEmailCode(String email) {
+    /**
+     * Will email the user with a code for logging in
+     */
+    public void requestEmailCode(String apiKey, String email) {
         try {
             ModioEmailRequestResponseDto emailRequestResponse = authClient.emailRequest(apiKey, email);
 
@@ -41,7 +59,11 @@ public class ModioAuthService {
         }
     }
 
-    public void exchangeEmailCode(String emailCode, Consumer<BearerToken> bearerTokenConsumer) {
+    /**
+     * Will fetch a "bearer token" to interact with the mod.io in the name of the user.
+     * The user counts as logged in when there is a valid bearer token.
+     */
+    public void exchangeEmailCode(String apiKey, String emailCode) {
         try {
             ModioAccessTokenDto accessToken = authClient.emailExchange(apiKey, emailCode);
 

@@ -3,10 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.argon.moduploader</groupId>
     <artifactId>root</artifactId>
-    <version>0.1.0</version>
+    <version>local</version>
     <packaging>pom</packaging>
 
-    <name>Mod Uploader</name>
     <description>A tool for uploading mods to various platforms</description>
     <organization>
         <name>Argon</name>
@@ -32,6 +31,8 @@
         <surefire-plugin.version>3.5.3</surefire-plugin.version>
         <steamworks4j.version>1.9.0</steamworks4j.version>
         <lombok.version>1.18.38</lombok.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <zip4j.version>2.11.5</zip4j.version>
     </properties>
 
     <dependencyManagement>
@@ -48,6 +49,11 @@
                 <artifactId>steamworks4j</artifactId>
                 <version>${steamworks4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>net.lingala.zip4j</groupId>
+                <artifactId>zip4j</artifactId>
+                <version>${zip4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -63,12 +69,13 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-jwt</artifactId>
+            <groupId>org.apache.camel.quarkus</groupId>
+            <artifactId>camel-quarkus-mapstruct</artifactId>
+            <version>3.4.0</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-jwt-build</artifactId>
+            <artifactId>quarkus-hibernate-validator</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -121,7 +128,15 @@
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
                         </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-Amapstruct.defaultComponentModel=jakarta</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>

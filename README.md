@@ -1,8 +1,9 @@
 # Mod Uploader
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+The "mod-uploader" (name recommendations welcome ^^) is still in an early stage of development.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+The vision is an uploader, which supports multiple platforms such as mod.io, Nexus, Steam Workshop, ...
+It will come as CLI and UI desktop application and runs on Windows, macOS and Linux
 
 ## Running the application in dev mode
 

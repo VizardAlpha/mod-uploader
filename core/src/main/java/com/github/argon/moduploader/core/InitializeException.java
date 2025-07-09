@@ -1,6 +1,6 @@
 package com.github.argon.moduploader.core;
 
-public class InitializeException extends Exception {
+public class InitializeException extends RuntimeException {
     public InitializeException(String message) {
         super(message);
     }

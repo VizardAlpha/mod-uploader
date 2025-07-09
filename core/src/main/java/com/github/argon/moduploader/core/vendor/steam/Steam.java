@@ -2,10 +2,14 @@ package com.github.argon.moduploader.core.vendor.steam;
 
 import com.codedisaster.steamworks.SteamAPI;
 import com.codedisaster.steamworks.SteamException;
-import com.github.argon.moduploader.core.Blockable;
+import com.github.argon.moduploader.core.Awaitable;
 import com.github.argon.moduploader.core.Initializable;
 import com.github.argon.moduploader.core.InitializeException;
-import com.github.argon.moduploader.core.file.FileService;
+import com.github.argon.moduploader.core.NotInitializedException;
+import com.github.argon.moduploader.core.file.IFileService;
+import com.github.argon.moduploader.core.vendor.steam.api.SteamStoreClient;
+import com.github.argon.moduploader.core.vendor.steam.api.SteamUserHandler;
+import com.github.argon.moduploader.core.vendor.steam.api.SteamWorkshopHandler;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,57 +25,88 @@ import java.time.Instant;
  * Contains all logic to initialize the native {@link SteamAPI}.
  */
 @Slf4j
-public class Steam implements Closeable, Blockable, Runnable, Initializable<Integer> {
-    public static final String STEAM_APP_ID_TXT = "steam_appid.txt";
-    private final FileService fileService;
+public class Steam implements Closeable, Awaitable, Runnable, Initializable<Integer> {
+
 
     @Getter
     private final String steamAppIdTxt;
-    @Getter
     private SteamWorkshopService workshop;
+    private Integer appId = SteamConfiguration.DEFAULT_APP_ID;
+    private final IFileService fileService;
+    private final SteamStoreClient storeClient;
+    private final SteamMapper mapper;
 
-    public Steam(Integer appId, FileService fileService) throws InitializeException {
-        this(appId, fileService, STEAM_APP_ID_TXT);
+    public Steam(IFileService fileService, SteamStoreClient storeClient, SteamMapper mapper) {
+        this(SteamConfiguration.STEAM_APP_ID_TXT, fileService, storeClient, mapper);
     }
 
+
+
     /**
-     * @param appId of the Steam game / application
      * @param fileService for writing the steamAppIdTxt
      * @param steamAppIdTxt name of the steam appid txt file, which needs to be present next to this app
-     * @throws InitializeException when {@link SteamAPI} initialization or steamAppIdTxt file creation fails
      */
-    public Steam(Integer appId, FileService fileService, String steamAppIdTxt) throws InitializeException {
+    public Steam(
+        String steamAppIdTxt,
+        IFileService fileService,
+        SteamStoreClient storeClient,
+        SteamMapper mapper
+    ) {
         this.steamAppIdTxt = steamAppIdTxt;
-        this.fileService = fileService != null ? fileService : new FileService();
+        this.fileService = fileService;
+        this.mapper = mapper;
+        this.storeClient = storeClient;
+    }
 
-        init(appId);
+    public SteamWorkshopService workshop() {
+        if (workshop == null) {
+            throw new NotInitializedException("You have to call Steam.init(appId) first");
+        }
+
+        return workshop;
+    }
+
+    public Integer appId() {
+        if (appId == null) {
+            throw new NotInitializedException("You have to call Steam.init(appId) first");
+        }
+
+        return appId;
     }
 
     /**
-     *
+     * Will throw away all open steam handlers if there are any
      */
     @Override
     public void close() {
-        workshop.close();
-        SteamAPI.shutdown();
-    }
-
-    /**
-     * Initializes Steam
-     *
-     * @param appId of the game to use
-     */
-    @Override
-    public void init(Integer appId) throws InitializeException {
-        initSteamAppId(appId);
-        initSteamNativeApi();
-
-        // make sure all open handlers are thrown away
         if (workshop != null) {
             workshop.close();
         }
 
-        workshop = new SteamWorkshopService(appId);
+        if (SteamAPI.isSteamRunning(true)) {
+            SteamAPI.shutdown();
+        }
+    }
+
+    /**
+     * Initializes Steam.
+     * Can be called again with a different appId to switch games.
+     * Due to the limitations of the {@link SteamAPI} only one game can be handled at the same time.
+     *
+     * @param appId of the game to use
+     */
+    @Override
+    public boolean init(Integer appId) {
+        log.debug("Initializing SteamAPI with appId: {}", appId);
+
+        close();
+        initSteamAppId(appId);
+        initSteamNativeApi(appId);
+
+        workshop = new SteamWorkshopService(new SteamWorkshopHandler(appId), mapper, new SteamUserHandler());
+        this.appId = appId;
+
+        return true;
     }
 
     /**
@@ -80,7 +115,7 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
      * @param timeout optional for ending the loop after a certain duration
      */
     @Override
-    public void block(@Nullable Duration timeout) {
+    public void awaits(@Nullable Duration timeout) {
         Instant end = null;
         if (timeout != null) {
             end = Instant.now().plus(timeout);
@@ -127,15 +162,15 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
     }
 
     /**
-     * The {@link SteamAPI} requires a file named like {@link Steam#STEAM_APP_ID_TXT}
+     * The {@link SteamAPI} requires a file named like {@link SteamConfiguration#STEAM_APP_ID_TXT}
      * with the app id of the game you want to work with.
-     *
      *
      * @param appId to write into the file
      * @throws InitializeException when writing the file fails
      */
-    private void initSteamAppId(Integer appId) throws InitializeException {
+    private void initSteamAppId(Integer appId) {
         Path steamAppIdTxtPath = Paths.get(steamAppIdTxt);
+        log.debug("Writing steam app id {} into {}", appId, steamAppIdTxtPath);
 
         try {
             fileService.write(steamAppIdTxtPath, appId.toString());
@@ -144,14 +179,28 @@ public class Steam implements Closeable, Blockable, Runnable, Initializable<Inte
         }
     }
 
-    private void initSteamNativeApi() throws InitializeException {
+    /**
+     * For initializing the {@link SteamAPI} library.
+     * This requires a "steam_appid.txt" file with an existing and valid "appid" in it.
+     *
+     * @throws InitializeException when loading the native libraries or {@link SteamAPI} initialization fails
+     */
+    private void initSteamNativeApi(Integer appId) {
+        log.debug("Initializing Steam native libraries and API");
+
         try {
             SteamAPI.loadLibraries();
-            if (!SteamAPI.init()) {
-                throw new InitializeException("Steamworks initialization error, e.g. Steam client not running");
+            if (!SteamAPI.init() || SteamAPI.restartAppIfNecessary(appId)) {
+                throw new InitializeException("""
+                    SteamAPI initialization error. This could be because:
+                    * Steam client is not running
+                    * steam_appid.txt is not next to the executed app
+                    * steam_appid.txt is empty
+                    * steam_appid.txt contains a not existing or invalid app id
+                    """);
             }
         } catch (SteamException e) {
-            throw new InitializeException("Error extracting or loading native Steam libraries", e);
+            throw new InitializeException("Error extracting or loading native SteamAPI libraries", e);
         }
     }
 }

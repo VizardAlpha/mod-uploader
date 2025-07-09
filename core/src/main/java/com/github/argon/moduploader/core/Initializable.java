@@ -1,5 +1,5 @@
 package com.github.argon.moduploader.core;
 
 public interface Initializable<T> {
-    void init(T init) throws InitializeException;
+    boolean init(T init) throws InitializeException;
 }

@@ -37,7 +37,7 @@ nb-configuration.xml
 *.rej
 
 # Local environment
-.env
+cli/.env
 
 # Plugin directory
 /.quarkus/cli/plugins/
@@ -47,3 +47,4 @@ nb-configuration.xml
 # mod-uploader
 steam_appid.txt
 *.token
+*.mv.db

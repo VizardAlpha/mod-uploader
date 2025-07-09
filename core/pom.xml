@@ -6,13 +6,17 @@
     <parent>
         <groupId>com.github.argon.moduploader</groupId>
         <artifactId>root</artifactId>
-        <version>0.1.0</version>
+        <version>local</version>
     </parent>
 
     <artifactId>core</artifactId>
-    <version>0.1.0</version>
+    <version>local</version>
 
     <dependencies>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-cache</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.code-disaster.steamworks4j</groupId>
             <artifactId>steamworks4j</artifactId>
@@ -24,6 +28,14 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-properties</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.lingala.zip4j</groupId>
+            <artifactId>zip4j</artifactId>
         </dependency>
     </dependencies>
 </project>
