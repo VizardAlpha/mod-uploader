@@ -1,15 +1,14 @@
 package com.github.argon.moduploader.ui.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import org.jboss.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Example service that will be injected into the controller.
  */
+@Slf4j
 @ApplicationScoped
 public class ExampleService {
-
-    private static final Logger LOG = Logger.getLogger(ExampleService.class);
 
     /**
      * Example method that will be called from the controller.
@@ -18,7 +17,7 @@ public class ExampleService {
      * @return The processed message
      */
     public String processMessage(String message) {
-        LOG.info("Processing message: " + message);
+        log.info("Processing message: " + message);
         return "Processed message: " + message.toUpperCase();
     }
 }

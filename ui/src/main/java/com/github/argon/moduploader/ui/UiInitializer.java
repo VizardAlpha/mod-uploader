@@ -8,7 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.jboss.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
@@ -17,10 +17,9 @@ import java.util.Objects;
  * This class observes the FxPostStartupEvent and loads the FXML file
  * to configure the main scene.
  */
+@Slf4j
 @ApplicationScoped
 public class UiInitializer {
-
-    private static final Logger LOG = Logger.getLogger(UiInitializer.class);
 
     @Inject
     FXMLLoader fxmlLoader;
@@ -32,7 +31,7 @@ public class UiInitializer {
      * @param event The post-startup event
      */
     public void onPostStartup(@Observes final FxPostStartupEvent event) {
-        LOG.info("Initializing user interface...");
+        log.info("Initializing user interface...");
         try {
             Stage primaryStage = event.getPrimaryStage();
             primaryStage.setTitle("Quarkus FX Example");
@@ -42,12 +41,12 @@ public class UiInitializer {
             // Check that the FXML file exists
             var fxmlStream = getClass().getResourceAsStream("/fxml/MainView.fxml");
             if (fxmlStream == null) {
-                LOG.error("FXML file not found at path /fxml/MainView.fxml");
+                log.error("FXML file not found at path /fxml/MainView.fxml");
                 throw new RuntimeException("FXML file not found");
             }
 
             // Load the FXML file
-            LOG.info("Loading FXML file...");
+            log.info("Loading FXML file...");
             Parent root = fxmlLoader.load(fxmlStream);
 
             // Create a scene and set it on the main stage
@@ -62,9 +61,9 @@ public class UiInitializer {
             // Show the main stage
             primaryStage.show();
 
-            LOG.info("User interface successfully initialized");
+            log.info("User interface successfully initialized");
         } catch (Exception e) {
-            LOG.error("Failed to initialize user interface", e);
+            log.error("Failed to initialize user interface", e);
         }
     }
 }

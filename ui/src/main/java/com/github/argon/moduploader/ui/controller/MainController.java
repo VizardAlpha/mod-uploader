@@ -7,17 +7,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import org.jboss.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Main controller for the user interface.
  * This class is automatically detected by FXMLLoader and methods
  * annotated with @FXML are bound to the corresponding elements in the FXML file.
  */
+@Slf4j
 @Dependent
 public class MainController {
-
-    private static final Logger LOG = Logger.getLogger(MainController.class);
 
     @FXML
     private TextField messageTextField;
@@ -34,12 +33,12 @@ public class MainController {
      */
     @FXML
     public void initialize() {
-        LOG.info("Initializing MainController");
+        log.info("Initializing MainController");
         // Check if resultLabel is null before calling setText
         if (resultLabel != null) {
             resultLabel.setText("Enter a message and click the button");
         } else {
-            LOG.warn("resultLabel is null during initialization");
+            log.warn("resultLabel is null during initialization");
         }
     }
 
@@ -58,6 +57,6 @@ public class MainController {
 
         String result = exampleService.processMessage(message);
         resultLabel.setText(result);
-        LOG.info("Button clicked, result: " + result);
+        log.info("Button clicked, result: " + result);
     }
 }
