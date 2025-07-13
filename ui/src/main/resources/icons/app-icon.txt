@@ -1,0 +1,9 @@
+# App Icon Placeholder
+
+This is a placeholder for the app icon. 
+
+To use a real icon:
+1. Replace this file with an actual icon file named "app-icon.png" for the JavaFX application
+2. Replace this file with an actual icon file named "app-icon.ico" for the Windows executable
+
+The icon should be a square image, preferably 256x256 pixels or larger.

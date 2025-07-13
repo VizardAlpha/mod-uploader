@@ -6,6 +6,13 @@
     <version>local</version>
     <packaging>pom</packaging>
 
+    <description>A tool for uploading mods to various platforms</description>
+    <organization>
+        <name>Argon</name>
+        <url>https://github.com/argon</url>
+    </organization>
+    <inceptionYear>2023</inceptionYear>
+
     <modules>
         <module>cli</module>
         <module>core</module>

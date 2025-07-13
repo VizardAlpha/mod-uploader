@@ -1,0 +1,40 @@
+/* Styles pour l'application Quarkus FX */
+
+.main-container {
+    -fx-background-color: #f5f5f5;
+}
+
+.title-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 0 0 20 0;
+}
+
+.primary-button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 8 15 8 15;
+    -fx-background-radius: 4;
+}
+
+.primary-button:hover {
+    -fx-background-color: #2980b9;
+}
+
+.result-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #27ae60;
+    -fx-padding: 15 0 0 0;
+    -fx-font-weight: bold;
+}
+
+TextField {
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1;
+    -fx-padding: 8;
+}

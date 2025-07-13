@@ -1,0 +1,222 @@
+/* Steam Light Theme CSS for Mod Uploader */
+
+/* Colors */
+* {
+    -fx-steam-light-bg: #f3f3f3;
+    -fx-steam-light-bg-darker: #e1e1e1;
+    -fx-steam-light-accent: #1999ff;
+    -fx-steam-light-accent-hover: #66c0f4;
+    -fx-steam-light-text: #171a21;
+    -fx-steam-light-text-secondary: #556772;
+    -fx-steam-light-border: #c7d5e0;
+    -fx-steam-light-success: #5c7e10;
+    -fx-steam-light-error: #c83c3c;
+}
+
+/* Root */
+.root {
+    -fx-background-color: -fx-steam-light-bg;
+    -fx-text-fill: -fx-steam-light-text;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 12px;
+}
+
+/* Label */
+.label {
+    -fx-text-fill: -fx-steam-light-text;
+}
+
+.label.header {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-steam-light-accent;
+}
+
+.label.subheader {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* Button */
+.button {
+    -fx-background-color: -fx-steam-light-bg-darker;
+    -fx-text-fill: -fx-steam-light-text;
+    -fx-border-color: -fx-steam-light-border;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: -fx-steam-light-accent-hover;
+    -fx-text-fill: white;
+}
+
+.button:pressed {
+    -fx-background-color: -fx-steam-light-accent;
+}
+
+.button.primary {
+    -fx-background-color: -fx-steam-light-accent;
+    -fx-text-fill: white;
+}
+
+.button.primary:hover {
+    -fx-background-color: -fx-steam-light-accent-hover;
+}
+
+/* Text Field */
+.text-field, .text-area {
+    -fx-background-color: white;
+    -fx-text-fill: -fx-steam-light-text;
+    -fx-border-color: -fx-steam-light-border;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 8px;
+}
+
+.text-field:focused, .text-area:focused {
+    -fx-border-color: -fx-steam-light-accent;
+}
+
+/* Combo Box */
+.combo-box {
+    -fx-background-color: -fx-steam-light-bg-darker;
+    -fx-text-fill: -fx-steam-light-text;
+    -fx-border-color: -fx-steam-light-border;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: -fx-steam-light-bg-darker;
+    -fx-text-fill: -fx-steam-light-text;
+}
+
+.combo-box .list-view {
+    -fx-background-color: -fx-steam-light-bg-darker;
+    -fx-border-color: -fx-steam-light-border;
+}
+
+.combo-box .list-cell:hover {
+    -fx-background-color: -fx-steam-light-accent-hover;
+    -fx-text-fill: white;
+}
+
+/* Tab Pane */
+.tab-pane {
+    -fx-background-color: -fx-steam-light-bg;
+    -fx-tab-min-width: 120px;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: -fx-steam-light-bg-darker;
+}
+
+.tab-pane .tab {
+    -fx-background-color: -fx-steam-light-bg-darker;
+    -fx-background-radius: 3px 3px 0 0;
+    -fx-border-color: -fx-steam-light-border;
+    -fx-border-width: 1px 1px 0 1px;
+    -fx-border-radius: 3px 3px 0 0;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: -fx-steam-light-accent;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: -fx-steam-light-text;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+/* Scroll Bar */
+.scroll-bar {
+    -fx-background-color: -fx-steam-light-bg;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -fx-steam-light-border;
+    -fx-background-radius: 3px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: -fx-steam-light-accent;
+}
+
+/* Table View */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: -fx-steam-light-border;
+}
+
+.table-view .column-header {
+    -fx-background-color: -fx-steam-light-bg-darker;
+    -fx-text-fill: -fx-steam-light-text;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: -fx-steam-light-text;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: white;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: -fx-steam-light-bg;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: -fx-steam-light-accent;
+}
+
+/* Dialog */
+.dialog-pane {
+    -fx-background-color: -fx-steam-light-bg;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: -fx-steam-light-bg-darker;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: -fx-steam-light-accent;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* Form */
+.form-container {
+    -fx-spacing: 10px;
+    -fx-padding: 20px;
+}
+
+.form-field {
+    -fx-spacing: 5px;
+}
+
+.form-field .label {
+    -fx-font-weight: bold;
+}
+
+/* Status Bar */
+.status-bar {
+    -fx-background-color: -fx-steam-light-bg-darker;
+    -fx-padding: 5px;
+    -fx-border-color: -fx-steam-light-border;
+    -fx-border-width: 1px 0 0 0;
+}
+
+/* Success and Error */
+.success-text {
+    -fx-text-fill: -fx-steam-light-success;
+}
+
+.error-text {
+    -fx-text-fill: -fx-steam-light-error;
+}
